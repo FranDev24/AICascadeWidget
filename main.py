@@ -334,7 +334,7 @@ async def chat(payload: ChatIn):
         try:
             sq.touch_key("google")
             g = _rq.post(
-                "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
+                "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent",
                 params={"key": k},
                 json={"contents": [{"parts": [{"text": message}]}],
                       "generationConfig": {"maxOutputTokens": 512}},
@@ -342,7 +342,7 @@ async def chat(payload: ChatIn):
             g.raise_for_status()
             txt = g.json()["candidates"][0]["content"]["parts"][0]["text"]
             return {"ok": True, "mode": "live", "provider": "google",
-                    "model": "gemini-2.0-flash", "response": txt,
+                    "model": "gemini-3.8-flash", "response": txt,
                     "attempts": attempts}
         except Exception as exc:
             attempts.append({"provider": "google", "error": _safe_err(exc)})
