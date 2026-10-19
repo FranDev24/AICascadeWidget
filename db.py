@@ -9,6 +9,7 @@ fallback a SQLite si Supabase falla (RLS, tabla inexistente, red, etc.).
 """
 
 import os
+import json
 import sqlite3
 import threading
 import logging
@@ -92,7 +93,9 @@ def insert_log(data: Dict[str, Any]) -> Dict[str, Any]:
                     data.get("tier_from") or 1,
                     data.get("tier_to") or 2,
                     data.get("session_id"),
-                    data.get("metadata") or "{}",
+                    json.dumps(data.get("metadata"))
+                    if isinstance(data.get("metadata"), dict)
+                    else (data.get("metadata") or "{}"),
                 ),
             )
             conn.commit()

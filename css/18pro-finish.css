@@ -39,7 +39,11 @@ h1, #panelTitle {
 /* Numerales: netos, tabulares, sin text-shadow ruidoso */
 .ios-num { text-shadow: none !important; }
 [data-theme="day"] .ios-num  { color: currentColor; }
-#iosRingVal { letter-spacing: -0.03em; font-weight: 800; }
+/* Numeros del anillo: SIEMPRE legibles en ambos temas */
+#iosRingVal { letter-spacing: -0.03em; font-weight: 800; color: #1A1D24 !important; font-variant-numeric: tabular-nums; }
+[data-theme="night"] #iosRingVal { color: #F5F7FA !important; }
+#iosRing .ios-ring-inner span { color: #8E95A5 !important; }
+[data-theme="night"] #iosRing .ios-ring-inner span { color: #9BA3B4 !important; }
 
 /* ---------- F2. Gauge circular SVG (arco real, nunca disco) ---------- */
 #iosRing { width: 132px; height: 132px; position: relative; display: grid; place-items: center; }

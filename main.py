@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 AICascade Widget - Backend FastAPI con Supabase Y SQLite.
@@ -42,6 +42,9 @@ SUPABASE_KEY = (os.getenv("SUPABASE_SERVICE_ROLE_KEY")
 supabase = None
 if not _placeholder(SUPABASE_URL) and not _placeholder(SUPABASE_KEY):
     try:
+        import socket
+        _host = SUPABASE_URL.split("//", 1)[1].split("/", 1)[0]
+        socket.gethostbyname(_host)  # valida DNS: proyecto eliminado -> fallback SQLite limpio
         from supabase import create_client
         supabase = create_client(SUPABASE_URL.strip(), SUPABASE_KEY.strip())
         logger.info(f"Supabase configurado: {SUPABASE_URL[:30]}...")
@@ -76,8 +79,17 @@ def mask_api_key(k: str) -> str:
     if not k:
         return ""
     if len(k) <= 8:
-        return "•" * len(k)
-    return k[:4] + "•" * (len(k) - 8) + k[-4:]
+        return "â€¢" * len(k)
+    return k[:4] + "â€¢" * (len(k) - 8) + k[-4:]
+
+
+def _safe_err(exc: Exception) -> str:
+    """Sanitiza errores: nunca exponer API keys en URLs/headers de mensajes."""
+    import re
+    msg = str(exc)
+    msg = re.sub(r"(key=)[^&\s]+", r"\1***", msg)
+    msg = re.sub(r"(Bearer\s)[A-Za-z0-9._\-]+", r"\1***", msg)
+    return msg[:300]
 
 
 def _utcnow() -> str:
@@ -317,6 +329,45 @@ async def chat(payload: ChatIn):
         r.raise_for_status()
         return str(r.json()["choices"][0]["message"]["content"])
 
+    k = _vault_key("google")
+    if k:
+        try:
+            sq.touch_key("google")
+            g = _rq.post(
+                "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
+                params={"key": k},
+                json={"contents": [{"parts": [{"text": message}]}],
+                      "generationConfig": {"maxOutputTokens": 512}},
+                timeout=30)
+            g.raise_for_status()
+            txt = g.json()["candidates"][0]["content"]["parts"][0]["text"]
+            return {"ok": True, "mode": "live", "provider": "google",
+                    "model": "gemini-2.0-flash", "response": txt,
+                    "attempts": attempts}
+        except Exception as exc:
+            attempts.append({"provider": "google", "error": _safe_err(exc)})
+    k = _vault_key("groq")
+    if k:
+        try:
+            sq.touch_key("groq")
+            return {"ok": True, "mode": "live", "provider": "groq",
+                    "model": "openai/gpt-oss-120b",
+                    "response": _oai("https://api.groq.com/openai/v1", k,
+                                     "openai/gpt-oss-120b"),
+                    "attempts": attempts}
+        except Exception as exc:
+            attempts.append({"provider": "groq", "error": _safe_err(exc)})
+    k = _vault_key("openrouter")
+    if k:
+        try:
+            sq.touch_key("openrouter")
+            return {"ok": True, "mode": "live", "provider": "openrouter",
+                    "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+                    "response": _oai("https://openrouter.ai/api/v1", k,
+                                     "nvidia/nemotron-3-ultra-550b-a55b:free"),
+                    "attempts": attempts}
+        except Exception as exc:
+            attempts.append({"provider": "openrouter", "error": _safe_err(exc)})
     k = _vault_key("openai")
     if k:
         try:
@@ -326,7 +377,7 @@ async def chat(payload: ChatIn):
                     "https://api.openai.com/v1", k, "gpt-4o-mini"),
                 "attempts": attempts}
         except Exception as exc:
-            attempts.append({"provider": "openai", "error": str(exc)[:300]})
+            attempts.append({"provider": "openai", "error": _safe_err(exc)})
     k = _vault_key("deepseek")
     if k:
         try:
@@ -336,7 +387,7 @@ async def chat(payload: ChatIn):
                 "response": _oai("https://api.deepseek.com/v1", k, "deepseek-chat"),
                 "attempts": attempts}
         except Exception as exc:
-            attempts.append({"provider": "deepseek", "error": str(exc)[:300]})
+            attempts.append({"provider": "deepseek", "error": _safe_err(exc)})
     try:
         r = _rq.post("http://127.0.0.1:11434/api/generate",
             json={"model": "llama3.1:8b", "prompt": message, "stream": False},

@@ -1,0 +1,346 @@
+/* ==========================================================================
+   AICascade Widget — iOS 18 Pro LIQUID GLASS (capa maestra definitiva)
+   Estilo iPhone 18 Pro: blur(20px), paleta Día (Plata) / Noche (Negro profundo),
+   bordes con destellos translúcidos, responsividad impecable iPhone + PC Dell.
+   CARGA ÚLTIMA para ganar en cascada de estilos. CERO lógica JS.
+   ========================================================================== */
+
+/* ---------- 0. Variables de paleta iPhone 18 Pro ---------- */
+:root {
+  --ios-bg-day: #f0f2f5;
+  --ios-bg-panel-day: rgba(255, 255, 255, 0.72);
+  --ios-border-day: rgba(255, 255, 255, 0.85);
+  --ios-text-day: #1A1D24;
+  --ios-text-sub-day: #5A6275;
+  --ios-accent-day: #007AFF;
+  --ios-glass-day: rgba(255, 255, 255, 0.68);
+  --ios-shadow-day: 0 20px 40px rgba(0, 0, 0, 0.06);
+  --ios-ring-day: #007AFF;
+
+  --ios-bg-night: #0a0a0f;
+  --ios-bg-panel-night: rgba(10, 10, 15, 0.78);
+  --ios-border-night: rgba(255, 255, 255, 0.10);
+  --ios-text-night: #F5F7FA;
+  --ios-text-sub-night: #8E95A5;
+  --ios-accent-night: #0B84FF;
+  --ios-glass-night: rgba(10, 10, 15, 0.72);
+  --ios-shadow-night: 0 20px 40px rgba(0, 0, 0, 0.55);
+  --ios-ring-night: #0B84FF;
+
+  --ios-tier-1: #007AFF;
+  --ios-tier-2: #FF9F0A;
+  --ios-tier-3: #34C759;
+  --ios-blur: blur(20px) saturate(180%);
+  --ios-radius: 28px;
+  --ios-transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+[data-theme="night"] {
+  --ios-bg: var(--ios-bg-night);
+  --ios-bg-panel: var(--ios-bg-panel-night);
+  --ios-border: var(--ios-border-night);
+  --ios-text: var(--ios-text-night);
+  --ios-text-sub: var(--ios-text-sub-night);
+  --ios-accent: var(--ios-accent-night);
+  --ios-glass: var(--ios-glass-night);
+  --ios-shadow: var(--ios-shadow-night);
+  --ios-ring: var(--ios-ring-night);
+}
+[data-theme="day"] {
+  --ios-bg: var(--ios-bg-day);
+  --ios-bg-panel: var(--ios-bg-panel-day);
+  --ios-border: var(--ios-border-day);
+  --ios-text: var(--ios-text-day);
+  --ios-text-sub: var(--ios-text-sub-day);
+  --ios-accent: var(--ios-accent-day);
+  --ios-glass: var(--ios-glass-day);
+  --ios-shadow: var(--ios-shadow-day);
+  --ios-ring: var(--ios-ring-day);
+}
+/* ---------- 1. Fondo base y cuerpo ---------- */
+html {
+  height: 100%;
+  touch-action: manipulation;
+}
+body {
+  height: 100vh;
+  height: -webkit-fill-available;
+  background: var(--ios-bg);
+  color: var(--ios-text);
+  font-family: 'Inter', -apple-system, SF Pro Text, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.5s ease, color 0.5s ease;
+  overflow-x: hidden;
+}
+
+/* ---------- 2. Liquid Glass card (blur 20px requisito) ---------- */
+.glass-card,
+.ios-hero-glow {
+  background: var(--ios-bg-panel) !important;
+  backdrop-filter: var(--ios-blur) !important;
+  -webkit-backdrop-filter: var(--ios-blur) !important;
+  border: 1px solid var(--ios-border) !important;
+  box-shadow: var(--ios-shadow) !important;
+  border-radius: var(--ios-radius) !important;
+  transition: var(--ios-transition) !important;
+}
+
+/* Bisel especular sutil (destello translúcido) */
+.glass-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg,
+    rgba(255,255,255,0.70),
+    rgba(255,255,255,0.10) 35%,
+    rgba(255,255,255,0.02) 55%,
+    rgba(255,255,255,0.45));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 4;
+  border-radius: var(--ios-radius);
+}
+[data-theme="night"] .glass-card::after {
+  background: linear-gradient(135deg,
+    rgba(255,255,255,0.12),
+    rgba(255,255,255,0.04) 35%,
+    rgba(255,255,255,0.01) 55%,
+    rgba(255,255,255,0.10));
+}
+
+/* ---------- 3. Texto metálico/refinado (sin gradientes ruidosos) ---------- */
+#panelTitle, #activeModel, #activeTier, .ios-clean-title, .ios-num {
+  background: none !important;
+  -webkit-background-clip: initial !important;
+  background-clip: initial !important;
+  text-shadow: none !important;
+  filter: none !important;
+  -webkit-text-fill-color: currentColor !important;
+  letter-spacing: -0.04em;
+}
+[data-theme="day"] #panelTitle,
+[data-theme="day"] #activeModel { color: #1A1D24 !important; text-shadow: 0 1px 1px rgba(255,255,255,0.7) !important; }
+[data-theme="night"] #panelTitle,
+[data-theme="night"] #activeModel { color: #F5F7FA !important; text-shadow: 0 1px 2px rgba(0,0,0,0.6) !important; }
+/* ---------- 4. Indicador de Nivel de Cascada (1 → 2 → 3) ---------- */
+.ios-tier-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border: 1px solid;
+  transition: var(--ios-transition);
+}
+.ios-tier-indicator.tier-1 {
+  background: rgba(10,132,255,0.10);
+  border-color: rgba(10,132,255,0.35);
+  color: #007AFF;
+}
+[data-theme="night"] .ios-tier-indicator.tier-1 {
+  background: rgba(11,132,255,0.14);
+  border-color: rgba(11,132,255,0.45);
+  color: #0B84FF;
+}
+.ios-tier-indicator.tier-2 {
+  background: rgba(255,159,10,0.10);
+  border-color: rgba(255,159,10,0.35);
+  color: #FF9F0A;
+}
+[data-theme="night"] .ios-tier-indicator.tier-2 {
+  background: rgba(255,159,10,0.14);
+  border-color: rgba(255,159,10,0.45);
+  color: #FF9F0A;
+}
+.ios-tier-indicator.tier-3 {
+  background: rgba(52,199,89,0.10);
+  border-color: rgba(52,199,89,0.35);
+  color: #34C759;
+}
+[data-theme="night"] .ios-tier-indicator.tier-3 {
+  background: rgba(52,199,89,0.14);
+  border-color: rgba(52,199,89,0.45);
+  color: #30d158;
+}
+
+/* Animación de conmutación de nivel */
+@keyframes ios-tier-switch {
+  0% { transform: scale(1); opacity: 1; }
+  40% { transform: scale(1.18); opacity: 0.85; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.ios-tier-indicator.switching {
+  animation: ios-tier-switch 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ---------- 5. Gauge circular iOS (arco real, no disco) ---------- */
+#iosRing {
+  width: 132px; height: 132px;
+  position: relative; display: grid; place-items: center;
+}
+#iosRing svg.ios-ring-svg {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+}
+#iosRing .ring-track {
+  stroke: rgba(255,255,255,0.10);
+  stroke-width: 11; stroke-linecap: round;
+}
+[data-theme="day"] #iosRing .ring-track { stroke: rgba(15,23,42,0.07); }
+#iosRing .ring-prog {
+  fill: none; stroke: var(--ring-ok, #34C759);
+  stroke-width: 11; stroke-linecap: round;
+  stroke-dasharray: 351.86px;
+  stroke-dashoffset: calc(var(--pct, 0) * -3.5186px);
+  transition: stroke-dashoffset 0.65s cubic-bezier(0.16, 1, 0.3, 1), stroke 0.4s ease;
+  filter: none !important;
+}
+#iosRing[data-tone="ok"]   .ring-prog { stroke: #34C759; }
+#iosRing[data-tone="warn"] .ring-prog { stroke: #FF9F0A; }
+#iosRing[data-tone="crit"] .ring-prog { stroke: #FF3B30; }
+[data-theme="night"] #iosRing[data-tone="ok"]   .ring-prog { stroke: #30d158; }
+[data-theme="night"] #iosRing[data-tone="warn"] .ring-prog { stroke: #FF9F0A; }
+[data-theme="night"] #iosRing[data-tone="crit"] .ring-prog { stroke: #ff453a; }
+
+/* ---------- 6. Barras de progreso tokens (tinta exacta) ---------- */
+#tokenBarTotal {
+  background: var(--ios-accent) !important;
+  height: 6px; border-radius: 999px; transition: width 0.5s ease, background 0.3s ease;
+}
+[data-theme="night"] #tokenBarTotal { background: var(--ios-accent) !important; }
+#tokenBarRemaining {
+  background: var(--ios-tier-3) !important;
+  height: 6px; border-radius: 999px; transition: width 0.5s ease, background 0.3s ease;
+}
+
+/* ---------- 7. Modelo activo / nivel (tier chips) ---------- */
+.model-item {
+  border-radius: 16px;
+  padding: 10px 14px;
+  border: 1px solid var(--ios-border);
+  background: var(--ios-bg-panel);
+  color: var(--ios-text);
+  transition: var(--ios-transition);
+}
+.model-item.active {
+  border-color: var(--ios-accent);
+  background: rgba(
+    var(--ios-accent-rgb, 0, 122, 255),
+    0.08
+  );
+  box-shadow: 0 0 0 1px var(--ios-accent) !important;
+}
+[data-theme="night"] .model-item.active {
+  background: rgba(11,132,255,0.12);
+}
+
+/* ---------- 8. Numerales tabulares (sin saltos visuales) ---------- */
+.ios-num {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+  transition: all 0.3s ease;
+}
+
+/* ---------- 9. Status dot ---------- */
+#statusDot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--ios-tier-3);
+  box-shadow: 0 0 0 rgba(52,199,89,0);
+  transition: background 0.3s ease;
+}
+#statusDot.critical { background: #FF3B30; }
+#statusDot.warning  { background: #FF9F0A; }
+#statusDot.ok       { background: #34C759; }
+
+/* ---------- 10. Botones iOS ---------- */
+.ios-btn {
+  border-radius: 14px;
+  font-weight: 600;
+  font-size: 13px;
+  transition: var(--ios-transition);
+  border: none;
+}
+/* ---------- 11. Dynamic Island y Status Bar (móvil) ---------- */
+.dynamic-island {
+  gap: 8px !important; padding: 8px 18px !important;
+  backdrop-filter: var(--ios-blur) !important;
+  -webkit-backdrop-filter: var(--ios-blur) !important;
+}
+#statusBar, #bottomTabBar {
+  backdrop-filter: var(--ios-blur) !important;
+  -webkit-backdrop-filter: var(--ios-blur) !important;
+}
+
+/* ---------- 12. Responsividad impecable: iPhone + PC Dell ---------- */
+@media (max-width: 768px) {
+  main { padding-bottom: 90px !important; padding-top: 14px !important; }
+  aside#sidebar { display: none !important; }
+  main { margin-left: 0 !important; }
+  .glass-card { border-radius: 22px !important; }
+  body { color: var(--ios-text) !important; }
+  #iosRing { width: 104px; height: 104px; }
+  #iosRing svg.ios-ring-svg { width: 104px; height: 104px; }
+  #iosRing .ring-prog { stroke-width: 10; stroke-dasharray: 282.6px; stroke-dashoffset: calc(var(--pct, 0) * -2.826px); }
+}
+@media (min-width: 769px) {
+  /* PC Dell: layout ancho, sidebar visible */
+  main { margin-left: 260px !important; padding: 24px; }
+}
+
+/* ---------- 13. Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ---------- 14. Toast iOS ---------- */
+#toast {
+  backdrop-filter: var(--ios-blur) !important;
+  -webkit-backdrop-filter: var(--ios-blur) !important;
+  border: 1px solid var(--ios-border) !important;
+  background: var(--ios-bg-panel) !important;
+  box-shadow: var(--ios-shadow) !important;
+}
+
+/* ---------- 15. Scrollbar sutil ---------- */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(128,128,128,0.35);
+  border-radius: 999px;
+}
+[data-theme="night"] ::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.15);
+}
+.ios-btn-primary {
+  background: var(--ios-accent);
+  color: #fff;
+  box-shadow: 0 10px 20px -10px var(--ios-accent);
+}
+.ios-btn-primary:hover {
+  filter: brightness(0.95);
+  transform: translateY(-1px);
+}
+.ios-btn-secondary {
+  background: var(--ios-bg-panel);
+  border: 1px solid var(--ios-border);
+  color: var(--ios-text);
+}
+.ios-btn-secondary:hover {
+  background: rgba(255,255,255,0.5);
+  border-color: rgba(255,255,255,0.8);
+}
+[data-theme="night"] .ios-btn-secondary:hover {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.18);
+}

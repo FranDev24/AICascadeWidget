@@ -10,3 +10,6 @@ venv/
 Thumbs.db
 .vscode/
 *.log
+
+# Base local con claves del vault (NUNCA al repo)
+aicascade.db

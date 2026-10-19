@@ -351,7 +351,14 @@ class CascadeManager {
       if (window.AIBackend && window.AIBackend.online) {
         const remaining = this.activeModel
           ? Math.max(0, this.activeModel.tpmLimit - this.activeModel.used) : null;
-        window.AIBackend.logFailover(oldName, newName, String(reason || ''), remaining);
+        const tierFrom = old ? old.tier : null;
+        const tierTo = this.activeModel ? this.activeModel.tier : null;
+        if (window.LiveSync && window.LiveSync.online) {
+          window.LiveSync.logFailover(oldName, newName, String(reason || ''),
+            remaining, tierFrom, tierTo);
+        } else {
+          window.AIBackend.logFailover(oldName, newName, String(reason || ''), remaining);
+        }
       }
     } catch (e) { /* modo local */ }
   }

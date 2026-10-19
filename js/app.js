@@ -17,8 +17,14 @@ const app = {
     }
     cascade.addLog('Sistema iniciado — Gestor de cascada listo');
     this.render();
+    // Auto-actualizacion de numeros/porcentajes cada 10s (siempre vivos)
+    setInterval(() => { try { this.render(); } catch (e) {} }, 10000);
+    // Telemetría del backend en vivo cada 15s (contadores persistentes)
+    setInterval(() => this._pollTelemetry(), 15000);
     terminal.init();
     vault.render();
+    // Sincronización en vivo con backend (Supabase/SQLite vía FastAPI)
+    if (window.LiveSync) { window.LiveSync.init(); }
     // Exponer global para onclick="app.*" y para palette/settings/terminal
     window.app = this;
     this.showToast('AICascade Widget', 'Sistema listo — Modelo más potente seleccionado automáticamente', 'success');
@@ -215,7 +221,23 @@ const app = {
 
     // Modelo activo
     document.getElementById('activeModel').textContent = s.activeModel;
-    document.getElementById('activeTier').textContent = s.activeTier;
+
+    // Indicador de nivel de cascada con chip de color + animación al cambiar
+    const tierEl = document.getElementById('activeTier');
+    const tierNum = s.activeTier && typeof s.activeTier === 'number' ? s.activeTier :
+      (String(s.activeTier || '').match(/\d/) || [0])[0];
+    const tierChanged = this._lastRenderedTier != null && this._lastRenderedTier !== tierNum;
+    if (tierEl) {
+      tierEl.textContent = 'Nivel ' + tierNum;
+      tierEl.className = 'text-sm font-bold mt-1 ios-num ios-tier-indicator tier-' + tierNum +
+        (tierChanged ? ' switching' : '');
+      if (tierChanged) {
+        setTimeout(() => {
+          if (tierEl) tierEl.classList.remove('switching');
+        }, 600);
+      }
+    }
+    this._lastRenderedTier = tierNum;
 
     // Tokens
     document.getElementById('totalTokens').textContent = s.totalTokens;
@@ -236,17 +258,21 @@ const app = {
     document.getElementById('statusText').textContent = s.statusText;
     document.getElementById('statusText').className = `text-xs font-bold ${s.statusColor}`;
     document.getElementById('statusDot').className = `w-2 h-2 rounded-full ${s.dotColor}`;
-    document.getElementById('switchCount').textContent = s.switchCount;
+    // Conmutaciones: totales persistentes (BD) si hay backend online, si no de la sesión
+    const dbOnline = window.AIBackend && window.AIBackend.online && this._dbSwitches != null;
+    document.getElementById('switchCount').textContent = dbOnline ? this._dbSwitches : s.switchCount;
     document.getElementById('callCount').textContent = s.callCount;
 
-    // iOS: anillo de progreso + Dynamic Island (solo visual, usa mismos datos)
+    // iOS: anillo SVG #iosRing (numero + arco + tono) + Dynamic Island
     try {
-      const ring = document.getElementById('tokenRing');
+      const ring = document.getElementById('iosRing');
       if (ring) {
+        // el CSS del arco lee --pct (18pro-finish.css); --ring-pct mantiene compat con capas previas
+        ring.style.setProperty('--pct', pct);
         ring.style.setProperty('--ring-pct', pct);
-        ring.style.setProperty('--ring-fg', pct >= 90 ? '#f43f5e' : pct >= 60 ? '#f59e0b' : '#10b981');
-        const pctEl = document.getElementById('tokenPct');
-        if (pctEl) pctEl.textContent = pct + '%';
+        ring.setAttribute('data-tone', pct >= 90 ? 'crit' : pct >= 60 ? 'warn' : 'ok');
+        const val = document.getElementById('iosRingVal');
+        if (val) val.textContent = pct + '%';
       }
       const island = document.getElementById('iosIslandText');
       if (island) island.textContent = `${s.activeModel} · ${s.statusText}`;
@@ -259,6 +285,28 @@ const app = {
 
     this.renderActivityLog();
     this.renderMetrics();
+  },
+
+  // Telemetría backend (persistida en BD) -> chips y estado en vivo
+  async _pollTelemetry() {
+    if (!(window.AIBackend && window.AIBackend.online)) return;
+    try {
+      const ctrl = new AbortController();
+      const t = setTimeout(() => ctrl.abort(), 4000);
+      const r = await fetch(window.AIBackend.baseUrl + '/api/cascade/telemetry',
+        { signal: ctrl.signal });
+      clearTimeout(t);
+      if (!r.ok) return;
+      const tel = await r.json();
+      // Guardar total persistido (lo consume render() sin parpadeos)
+      if (typeof tel.total_switches === 'number') this._dbSwitches = tel.total_switches;
+      const hint = document.getElementById('statusHint');
+      if (hint && tel.current_model) hint.textContent = 'Último cambio: ' + tel.current_model;
+      const tok = document.getElementById('backendTokens');
+      if (tok && typeof tel.total_tokens_used === 'number') {
+        tok.textContent = tel.total_tokens_used.toLocaleString();
+      }
+    } catch (e) {}
   },
 
   // Métricas reales en el dashboard
