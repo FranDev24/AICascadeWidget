@@ -79,7 +79,7 @@ section .glass-card {
     0 0 40px rgba(99,102,241,.05) !important;
 }
 
-/* ----- 4. Texto metálico reflectante ----- */
+/* ----- 4. Texto metï¿½lico reflectante ----- */
 #panelTitle, #activeModel, .liquid-text {
   background: linear-gradient(180deg,
     currentColor 30%,
@@ -89,7 +89,7 @@ section .glass-card {
   background-clip: text;
   text-shadow: 0 1px 12px rgba(96,165,250,.15);
 }
-[data-theme= night] #panelTitle,
+[data-theme="night"] #panelTitle,
 [data-theme=night] #activeModel,
 [data-theme=night] .liquid-text {
   text-shadow: 0 0 24px rgba(96,165,250,.25);
@@ -116,7 +116,7 @@ section .glass-card {
   to { background-position: 100% 50%; }
 }
 
-/* ----- 5. Física de resortes: hover magnético ----- */
+/* ----- 5. Fï¿½sica de resortes: hover magnï¿½tico ----- */
 .glass-card,
 button,
 .ios-btn,
@@ -243,7 +243,7 @@ main section:not(.hidden) > div.glass-card:nth-child(4) { animation-delay: .18s;
     inset 0 1px 0 rgba(255,255,255,.50) !important;
 }
 
-/* ----- 14. Respetar movimiento reducido y optimizar móvil ----- */
+/* ----- 14. Respetar movimiento reducido y optimizar mï¿½vil ----- */
 @media (prefers-reduced-motion: reduce) {
   body::after,
   .ultra-shine,

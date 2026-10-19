@@ -1,0 +1,167 @@
+/* ==========================================================================
+   AICascade Widget — UIVERSE INTEGRATION LAYER (carga FINAL)
+   Componentes estilo Uiverse (MIT) adaptados a la paleta oficial
+   iPhone 18 Pro Plata / Negro Titanium. Hooks sobre clases existentes
+   (.ios-btn, .glass-card, .model-item, input[type=checkbox]) → cero JS.
+   ========================================================================== */
+
+@property --beam-angle { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+@property --uv-shine { syntax: '<percentage>'; inherits: false; initial-value: -40%; }
+
+/* ======================= UV-01 Botones magnéticos + shine ======================= */
+.ios-btn { position: relative; overflow: hidden; isolation: isolate; }
+.ios-btn::after {
+  content: ""; position: absolute; top: 0; left: var(--uv-shine);
+  width: 45%; height: 100%; transform: skewX(-18deg); border-radius: inherit;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+  opacity: 0; pointer-events: none; z-index: 3;
+  transition: opacity .2s ease;
+}
+.ios-btn:hover::after { opacity: 1; animation: uvSweep .75s cubic-bezier(0.16,1,0.3,1); }
+@keyframes uvSweep {
+  from { left: -50%; } to { left: 115%; }
+}
+@media (hover: none) {
+  .ios-btn::after { display: none; }
+  .ios-btn:active { transform: scale(0.95); }
+}
+
+/* Presión física al presionar (elástico) */
+.ios-btn:active { transform: scale(0.96) !important; }
+.ios-btn-primary {
+  box-shadow: 0 5px 16px rgba(0,122,255,0.35), inset 0 1px 0 rgba(255,255,255,0.35) !important;
+  background: linear-gradient(180deg, #1a8dff 0%, #0074f5 100%) !important;
+}
+[data-theme="night"] .ios-btn-primary {
+  background: linear-gradient(180deg, #0B84FF 0%, #0663c8 100%) !important;
+  box-shadow: 0 6px 20px rgba(11,132,255,0.45), inset 0 1px 0 rgba(255,255,255,0.25) !important;
+}
+
+/* ===================== UV-02 Bordes lumínicos (beam rotativo) ==================== */
+/* Contenedor activo: hero de la cascada + terminal en uso */
+@media (min-width: 1px) {
+  .beam-card, #panel-dashboard > .glass-card:first-of-type {
+    position: relative;
+  }
+  .beam-card::before,
+  #panel-dashboard > .glass-card:first-of-type::before {
+    content: "" !important;
+    position: absolute; inset: 0; border-radius: inherit; padding: 1.5px;
+    background: conic-gradient(from var(--beam-angle),
+      rgba(255,255,255,0.55) 0deg,
+      rgba(0,122,255,0.65) 55deg,
+      rgba(255,255,255,0.10) 120deg,
+      rgba(0,122,255,0.55) 235deg,
+      rgba(255,255,255,0.50) 300deg,
+      rgba(255,255,255,0.55) 360deg);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: destination-out;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    animation: uvBeamSpin 8s linear infinite;
+    opacity: .9;
+    pointer-events: none;
+    z-index: 1;
+  }
+  /* Noche: neón cobalto */
+  [data-theme="night"] #panel-dashboard > .glass-card:first-of-type::before {
+    background: conic-gradient(from var(--beam-angle),
+      rgba(255,255,255,0.10) 0deg,
+      rgba(11,132,255,0.85) 55deg,
+      rgba(100,210,255,0.40) 100deg,
+      rgba(11,132,255,0.25) 150deg,
+      rgba(11,132,255,0.85) 250deg,
+      rgba(255,255,255,0.12) 360deg);
+  }
+}
+@keyframes uvBeamSpin { to { --beam-angle: 360deg; } }
+
+/* Haz de luz en la fila del modelo ACTIVO */
+.model-item.active { position: relative; overflow: hidden; }
+.model-item.active::before {
+  content: ""; position: absolute; left: 0; top: 12%; bottom: 12%; width: 3px;
+  border-radius: 9999px;
+  background: linear-gradient(180deg, transparent, var(--ios-accent) 30%, var(--ios-accent) 70%, transparent);
+  animation: uvPulse 2.2s ease-in-out infinite;
+}
+[data-theme="night"] .model-item.active::before {
+  background: linear-gradient(180deg, transparent, #0B84FF 30%, rgba(100,210,255,0.85) 70%, transparent);
+}
+@keyframes uvPulse { 0%,100% { opacity: .55; transform: scaleY(.92); } 50% { opacity: 1; transform: scaleY(1); } }
+
+/* ===================== UV-03 Interruptores iOS (spring físico) =================== */
+input[type="checkbox"] {
+  transition: background .35s cubic-bezier(0.16,1,0.3,1),
+              box-shadow .35s cubic-bezier(0.16,1,0.3,1) !important;
+}
+input[type="checkbox"]:checked {
+  background: #34C759 !important;
+  box-shadow:
+    inset 0 1px 3px rgba(48,209,88,0.4),
+    0 0 10px rgba(52,199,89,0.30),
+    inset 0 0 0 1px rgba(52,199,89,0.2) !important;
+}
+[data-theme="night"] input[type="checkbox"]:checked {
+  background: #0B84FF !important;
+  box-shadow:
+    inset 0 1px 3px rgba(11,132,255,0.5),
+    0 0 12px rgba(11,132,255,0.45),
+    inset 0 0 0 1px rgba(100,210,255,0.3) !important;
+}
+
+/* ===================== UV-04 Tarjeta flotante del héroe (3D idle) ================ */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) and (min-width: 1024px) {
+  #panel-dashboard > .glass-card:first-of-type {
+    animation: uvFloat 7s ease-in-out infinite;
+  }
+}
+@keyframes uvFloat {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -4px; }
+}
+/* No chocará con el hover tilt: el hover pausa el float */
+#panel-dashboard > .glass-card:first-of-type:hover { animation-play-state: paused; }
+
+/* ===================== UV-05 Tipografía "grabado láser" sobrio ==================== */
+/* (texto sólido + doble bisel de 1px; sin gradientes ni manchas) */
+[data-theme="day"] #panelTitle,
+[data-theme="day"] #activeModel {
+  color: #1A1D24 !important;
+  text-shadow:
+    0 1px 0 rgba(255,255,255,0.85),
+    0 -1px 0 rgba(0, 0, 0, 0.055) !important;
+}
+[data-theme="night"] #panelTitle,
+[data-theme="night"] #activeModel {
+  color: #F5F7FA !important;
+  text-shadow:
+    0 -1px 0 rgba(255,255,255,0.10),
+    0 1px 2px rgba(0,0,0,0.55) !important;
+}
+/* Labels de métricas: gravado al día, cian al noche */
+[data-theme="day"] .ios-num { color: #2a303c; }
+[data-theme="night"] .ios-num { text-shadow: 0 0 8px rgba(100,210,255,0.18) !important; }
+
+/* ===================== UV-06 Hover dimensional en tiles ========================= */
+@media (hover: hover) {
+  .ios-tile {
+    transition: transform .35s cubic-bezier(0.16,1,0.3,1), box-shadow .35s, filter .35s !important;
+  }
+  .ios-tile:hover {
+    transform: scale(1.05) translateY(-1px) !important;
+    box-shadow: 0 6px 18px rgba(15,23,42,0.16), inset 0 1px 0 rgba(255,255,255,0.6) !important;
+  }
+  [data-theme="night"] .ios-tile:hover {
+    box-shadow: 0 6px 18px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.12) !important;
+  }
+}
+
+/* ===================== UV-07 Logo "AICascade" del rail con gloss ================== */
+aside#sidebar > div:first-child .w-9 {
+  position: relative; overflow: hidden;
+}
+aside#sidebar > div:first-child .w-9::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit;
+  background: linear-gradient(160deg, rgba(255,255,255,0.45) 0%, transparent 40%, rgba(255,255,255,0.12) 100%);
+  pointer-events: none;
+}

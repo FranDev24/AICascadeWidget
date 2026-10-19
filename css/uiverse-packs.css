@@ -1,0 +1,62 @@
+// ============================================================================
+// AICascade Widget — Puente Uiverse (MIT) favoritos
+// ============================================================================
+// Cómo usar tus favoritos de Uiverse en 10 segundos:
+//  1) Abre un elemento de tus Favoritos en uiverse.io (sesión onirok_6519)
+//  2) Copia el bloque CSS que te muestra y PÉGALO más abajo, antes de la
+//     sección "FIN DE COPIAS". Ya está enlazado en index.html (cargaautomática).
+// Todo el contenido de Uiverse es MIT: pégalo sin miedo.
+// ============================================================================
+
+/* ---------- PACK INICIAL (listo para usar) ---------- */
+
+/* UV-01 · Loader iOS (anillo giratorio de vidrio) */
+.uv-loader {
+  width: 18px; height: 18px; border-radius: 50%;
+  border: 2.5px solid rgba(255,255,255,0.18);
+  border-top-color: var(--ios-accent, #0B84FF);
+  animation: uv-spin 0.8s cubic-bezier(0.6, 0.2, 0.4, 0.8) infinite;
+}
+@keyframes uv-spin { to { transform: rotate(360deg); } }
+
+/* UV-02 · Botón vidrio "aero gloss" (brillo superior) */
+.uv-btn {
+  position: relative; overflow: hidden;
+  border-radius: 14px;
+  background: linear-gradient(to bottom,
+    rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.45) 50%, rgba(255,255,255,0.25) 100%);
+  border: 1px solid rgba(255,255,255,0.7);
+  box-shadow: 0 4px 14px rgba(160,175,200,0.25), inset 0 1px 0 #fff;
+  color: #1A1D24; font-weight: 600; font-size: 14px;
+  transition: transform .25s cubic-bezier(0.16,1,0.3,1), box-shadow .25s;
+}
+.uv-btn::before {
+  content: ""; position: absolute; inset: 1px; border-radius: inherit;
+  background: linear-gradient(to bottom, rgba(255,255,255,0.35), transparent 55%);
+  pointer-events: none;
+}
+.uv-btn:hover { transform: translateY(-1px) scale(1.02); box-shadow: 0 8px 22px rgba(160,175,200,0.35), inset 0 1px 0 #fff; }
+[data-theme="night"] .uv-btn {
+  background: linear-gradient(to bottom, rgba(255,255,255,0.14), rgba(255,255,255,0.06) 100%);
+  border-color: rgba(255,255,255,0.12);
+  color: #F5F7FA;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.10);
+}
+
+/* UV-03 · Segmented control iOS Functional (2 estados, puro CSS) */
+.uv-seg { display: inline-flex; padding: 3px; gap: 2px;
+  background: rgba(120,120,128,0.16); border-radius: 10px; }
+.uv-seg > button { border: none; background: transparent; padding: 7px 16px;
+  border-radius: 8px; font-size: 13px; font-weight: 600; color: #1A1D24; cursor: pointer;
+  transition: all .25s cubic-bezier(0.16,1,0.3,1); }
+.uv-seg > button.is-on { background: rgba(255,255,255,0.9); box-shadow: 0 1px 3px rgba(15,23,42,0.18); }
+[data-theme="night"] .uv-seg { background: rgba(120,120,128,0.28); }
+[data-theme="night"] .uv-seg > button { color: #F5F7FA; }
+[data-theme="night"] .uv-seg > button.is-on { background: rgba(255,255,255,0.20); }
+
+/* UV-04 · Checkbox iOS "dial" (ya existe .input checkbox switch global;
+   este es el variante con icono) */
+.uv-toggle { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; }
+.uv-toggle input { accent-color: var(--ios-accent, #0B84FF); width: 18px; height: 18px; }
+
+/* ---------- FIN DE COPIAS (pega aquí tus favoritos de Uiverse) ---------- */

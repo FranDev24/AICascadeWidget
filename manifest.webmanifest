@@ -1,19 +1,11 @@
 {
-  "name": "AICascade Widget — Gestor de Cascada IA",
+  "name": "AICascadeWidget",
   "short_name": "AICascade",
-  "description": "HUD Liquid Glass para gestionar tu cascada de modelos IA con failover automático.",
-  "start_url": "./index.html",
-  "scope": "./",
+  "description": "HUD Liquid Glass iOS 18 Pro — cascada de IA con failover, vault de API keys y terminal super admin.",
+  "version": "2.1.0",
+  "start_url": "/",
   "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#0a0a0f",
-  "theme_color": "#0a0a0f",
-  "lang": "es",
-  "icons": [
-    { "src": "icons/icon-16.png", "sizes": "16x16", "type": "image/png" },
-    { "src": "icons/icon-32.png", "sizes": "32x32", "type": "image/png" },
-    { "src": "icons/icon-180.png", "sizes": "180x180", "type": "image/png" },
-    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
-  ]
+  "background_color": "#0a0b0e",
+  "theme_color": "#0a0b0e",
+  "icons": []
 }
