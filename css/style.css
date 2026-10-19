@@ -1,0 +1,490 @@
+/* ==========================================================================
+   AICascade Widget — Liquid Glass & Apple iPhone 18 Pro Design System
+   ========================================================================== */
+
+/* Variables base (sobrescritas por data-theme) */
+:root {
+  --bg-primary: #f8fafc;
+  --bg-secondary: #ffffff;
+  --glass-bg: rgba(255, 255, 255, 0.65);
+  --glass-border: rgba(255, 255, 255, 0.7);
+  --glass-shadow: 0 8px 32px rgba(31, 38, 135, 0.08);
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --transition-smooth: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  --blur-glass: blur(24px) saturate(180%);
+}
+
+[data-theme="night"] {
+  --bg-primary: #020617;
+  --bg-secondary: #0f172a;
+  --glass-bg: rgba(15, 23, 42, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --text-primary: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --text-muted: #64748b;
+  --accent: #38bdf8;
+  --accent-hover: #0ea5e9;
+  --success: #34d399;
+  --warning: #fbbf24;
+  --danger: #f87171;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --transition-smooth: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  --blur-glass: blur(24px) saturate(100%);
+}
+
+/* Reset y base */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ========== Utilitarios de vidrio líquido (Liquid Glass) ========== */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: var(--blur-glass);
+  -webkit-backdrop-filter: var(--blur-glass);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+/* Bordes con gradiente sutil (efecto Apple) */
+.glass-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.4), rgba(255,255,255,0.05));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: destination-out;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.glass-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ========== Sobrescrituras MODO NOCHE para clases de Tailwind ========== */
+[data-theme="night"] .bg-gray-50,
+[data-theme="night"] .bg-white,
+[data-theme="night"] .bg-white\/50,
+[data-theme="night"] .bg-white\/80,
+[data-theme="night"] .bg-blue-50\/50 {
+  background-color: rgba(15, 23, 42, 0.6) !important;
+}
+
+[data-theme="night"] .text-gray-900 {
+  color: #f1f5f9 !important;
+}
+
+[data-theme="night"] .text-gray-800 {
+  color: #e2e8f0 !important;
+}
+
+[data-theme="night"] .text-gray-700 {
+  color: #cbd5e1 !important;
+}
+
+[data-theme="night"] .text-gray-600 {
+  color: #94a3b8 !important;
+}
+
+[data-theme="night"] .text-gray-500 {
+  color: #64748b !important;
+}
+
+[data-theme="night"] .text-gray-400 {
+  color: #475569 !important;
+}
+
+[data-theme="night"] .border-gray-200,
+[data-theme="night"] .border-gray-100,
+[data-theme="night"] .border-white\/20,
+[data-theme="night"] .border-white\/40,
+[data-theme="night"] .border-white\/50,
+[data-theme="night"] .border-white\/30 {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="night"] .bg-gray-100 {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+[data-theme="night"] .bg-blue-50 {
+  background-color: rgba(56, 189, 248, 0.1) !important;
+}
+
+[data-theme="night"] .bg-blue-100\/50 {
+  background-color: rgba(56, 189, 248, 0.1) !important;
+}
+
+[data-theme="night"] .shadow-blue-500\/30 {
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.15) !important;
+}
+
+[data-theme="night"] .text-blue-700,
+[data-theme="night"] .text-blue-600,
+[data-theme="night"] .text-blue-500 {
+  color: #38bdf8 !important;
+}
+
+[data-theme="night"] .text-green-600 {
+  color: #34d399 !important;
+}
+
+[data-theme="night"] .text-amber-600 {
+  color: #fbbf24 !important;
+}
+
+[data-theme="night"] .text-rose-500 {
+  color: #f87171 !important;
+}
+
+[data-theme="night"] .bg-green-400 {
+  background-color: #34d399 !important;
+}
+
+[data-theme="night"] .bg-amber-500 {
+  background-color: #fbbf24 !important;
+}
+
+[data-theme="night"] .bg-rose-500 {
+  background-color: #f87171 !important;
+}
+
+[data-theme="night"] .bg-green-500 {
+  background-color: #34d399 !important;
+}
+
+[data-theme="night"] .bg-rose-50 {
+  background-color: rgba(248, 113, 113, 0.1) !important;
+}
+
+[data-theme="night"] .bg-amber-50 {
+  background-color: rgba(251, 191, 36, 0.1) !important;
+}
+
+[data-theme="night"] .bg-green-50 {
+  background-color: rgba(52, 211, 153, 0.1) !important;
+}
+
+[data-theme="night"] .placeholder-gray-600 {
+  color: #64748b !important;
+  opacity: 1 !important;
+}
+
+[data-theme="night"] .bg-blue-500 {
+  background-color: #38bdf8 !important;
+}
+
+[data-theme="night"] .bg-green-500 {
+  background-color: #34d399 !important;
+}
+
+[data-theme="night"] .bg-amber-500 {
+  background-color: #fbbf24 !important;
+}
+
+[data-theme="night"] .bg-rose-500 {
+  background-color: #f87171 !important;
+}
+
+[data-theme="night"] .bg-gray-700 {
+  background-color: #1e293b !important;
+}
+
+[data-theme="night"] .bg-gray-900\/80 {
+  background-color: rgba(2, 6, 23, 0.8) !important;
+}
+
+[data-theme="night"] .bg-gray-900\/50 {
+  background-color: rgba(2, 6, 23, 0.5) !important;
+}
+
+/* ========== Scrollbar ========== */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--text-muted);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+/* ========== Model tiers ========== */
+.tier-1 {
+  border-left: 4px solid #3b82f6;
+}
+.tier-2 {
+  border-left: 4px solid #f59e0b;
+}
+.tier-3 {
+  border-left: 4px solid #10b981;
+}
+
+.model-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  transition: var(--transition-smooth);
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+[data-theme="night"] .model-item {
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(255,255,255,0.1);
+}
+
+.model-item.active {
+  background: rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.4);
+  color: #1e40af;
+}
+
+[data-theme="night"] .model-item.active {
+  background: rgba(56, 189, 248, 0.15);
+  border-color: rgba(56, 189, 248, 0.4);
+  color: #38bdf8;
+}
+
+.model-item .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+}
+
+.model-item .dot.critical {
+  background: #ef4444;
+  animation: pulse 1.5s infinite;
+}
+
+.model-item .dot.warning {
+  background: #f59e04;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* ========== Barra de progreso tokens ========== */
+.token-track {
+  width: 100%;
+  height: 6px;
+  background: rgba(0,0,0,0.08);
+  border-radius: 3px;
+  overflow: hidden;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+[data-theme="night"] .token-track {
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(255,255,255,0.08);
+}
+
+.token-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* ========== Toast ========== */
+.toast-enter {
+  transform: translateY(100px);
+  opacity: 0;
+}
+.toast-enter-active {
+  transform: translateY(0);
+  opacity: 1;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.toast-exit {
+  transform: translateY(100px);
+  opacity: 0;
+}
+
+/* ========== Inputs y controles ========== */
+input, select, textarea {
+  font-family: inherit;
+}
+
+.btn-glass {
+  background: rgba(255,255,255,0.5);
+  border: 1px solid rgba(255,255,255,0.6);
+  color: var(--text-primary);
+  transition: var(--transition-smooth);
+}
+[data-theme="night"] .btn-glass {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--text-primary);
+}
+.btn-glass:hover {
+  background: rgba(255,255,255,0.7);
+  border-color: rgba(255,255,255,0.9);
+}
+[data-theme="night"] .btn-glass:hover {
+  background: rgba(255,255,255,0.15);
+  border-color: rgba(255,255,255,0.25);
+}
+
+/* ========== Utilidades de animación ========== */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.animate-float {
+  animation: float 5s ease-in-out infinite;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-slide-in {
+  animation: slideIn 0.4s ease-out forwards;
+}
+
+/* ========== Terminal ========== */
+.terminal-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 1em;
+  background: var(--text-primary);
+  animation: blink 1s steps(2) infinite;
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* ========== Responsive ========== */
+@media (max-width: 768px) {
+  aside#sidebar {
+    width: 72px;
+  }
+  aside#sidebar span.hidden.md\\:block {
+    display: none;
+  }
+  main {
+    margin-left: 72px;
+    padding: 4px;
+  }
+}
+
+/* ========== Sidebar modo noche ========== */
+[data-theme="night"] #sidebar {
+  background: rgba(15, 23, 42, 0.8) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="night"] #sidebar > div:first-child {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="night"] #sidebar #sidebarBrand {
+  color: #f1f5f9 !important;
+}
+
+[data-theme="night"] #sidebar .nav-item {
+  color: #94a3b8 !important;
+}
+
+[data-theme="night"] #sidebar .nav-item:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: #f1f5f9 !important;
+}
+
+[data-theme="night"] #sidebar .nav-item svg {
+  color: #94a3b8 !important;
+}
+
+[data-theme="night"] #sidebar .nav-item:hover svg {
+  color: #f1f5f9 !important;
+}
+
+[data-theme="night"] #sidebar #btn-theme {
+  color: #94a3b8 !important;
+}
+
+[data-theme="night"] #sidebar #btn-theme:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+[data-theme="night"] #sidebar #btn-theme .theme-icon {
+  color: #f1f5f9 !important;
+}
+
+[data-theme="night"] #sidebar #themeLabel {
+  color: #f1f5f9 !important;
+}
+
+[data-theme="night"] #sidebar .border-b {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="night"] #sidebar .border-t {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* ========== Sidebar modo día ========== */
+[data-theme="day"] #sidebar #btn-theme .theme-icon {
+  color: #0f172a !important;
+}
+
+[data-theme="day"] #sidebar #themeLabel {
+  color: #0f172a !important;
+}
+
+/* ========== main margen sidebar ========== */
+[data-theme="day"] main {
+  margin-left: 260px !important;
+}
+
+[data-theme="night"] main {
+  margin-left: 260px !important;
+}
+
+/* Imprimir limpio */
+@media print {
+  body { background: white !important; color: black !important; }
+  .glass-card { background: white !important; border: 1px solid #ddd !important; box-shadow: none !important; }
+}

@@ -1,0 +1,87 @@
+/* ==========================================================================
+   AICascade Widget — Capa iPhone 16 Pro / iOS 18 (viewport, safe-area, tactil)
+   Se suma al design system existente sin modificarlo.
+   ========================================================================== */
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100dvh;
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+  padding-bottom: env(safe-area-inset-bottom);
+  overscroll-behavior-y: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+/* Sidebar -> bottom bar en iPhone */
+@media (max-width: 768px) {
+  aside#sidebar {
+    top: auto !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    height: calc(64px + env(safe-area-inset-bottom)) !important;
+    padding-bottom: env(safe-area-inset-bottom);
+    flex-direction: row !important;
+    align-items: center;
+    overflow-x: auto;
+    overflow-y: hidden !important;
+    border-right: none !important;
+    border-top: 1px solid var(--glass-border);
+    z-index: 50;
+  }
+  aside#sidebar > div:first-child { display: none !important; }
+  aside#sidebar nav {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 2px;
+    padding: 6px 8px !important;
+    width: 100%;
+  }
+  aside#sidebar .nav-item {
+    flex: 1;
+    flex-direction: column !important;
+    gap: 2px !important;
+    padding: 6px 2px !important;
+    font-size: 9px !important;
+    justify-content: center;
+  }
+  aside#sidebar .nav-item svg { width: 20px !important; height: 20px !important; }
+  aside#sidebar .nav-item span { font-size: 9px !important; }
+  aside#sidebar > div:last-child { display: none !important; }
+  main {
+    margin-left: 0 !important;
+    padding-bottom: calc(84px + env(safe-area-inset-bottom)) !important;
+  }
+}
+
+/* Botones y inputs tamaño dedo (44px) en tactil */
+@media (pointer: coarse) {
+  button, .nav-item, input, select, textarea, label {
+    min-height: 44px;
+  }
+  input, textarea, select { font-size: 16px !important; } /* evita auto-zoom iOS */
+}
+
+/* Fluidez 120Hz ProMotion */
+@media (max-width: 768px) {
+  * { animation-duration: .22s !important; transition-duration: .18s !important; }
+  .glass-card::before { display: none; } /* menos GPU en movil */
+}
+
+/* Standalone PWA (instalada): respeta el notch / Dynamic Island */
+@media (display-mode: standalone) {
+  body { padding-top: env(safe-area-inset-top); }
+  header { padding-top: 4px; }
+}
+
+/* Reduce blur pesado si el usuario prefiere menos movimiento */
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}

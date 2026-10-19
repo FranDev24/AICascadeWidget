@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="day">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>AICascade Widget | Gestor de Cascada IA</title>
+  <meta name="description" content="HUD Liquid Glass para gestionar tu cascada de modelos IA con failover automatico, vault de API keys y terminal super admin.">
+  <!-- PWA / iPhone 16 Pro (iOS 18) -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="AICascade">
+  <meta name="theme-color" content="#0a0a0f" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#f0f2f5" media="(prefers-color-scheme: light)">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/icon-180.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="icons/icon-16.png">
+  <!-- Open Graph para WhatsApp -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="AICascade Widget — Gestor de Cascada IA">
+  <meta property="og:description" content="HUD Liquid Glass: failover automatico entre 9 modelos IA, vault de API keys y terminal super admin. Instalable en iPhone.">
+  <meta property="og:image" content="icons/og-cover.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=20261019c">
+  <link rel="stylesheet" href="css/iphone.css?v=20261019c">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            titanium: {
+              light: '#f0f2f5',
+              DEFAULT: '#c9d1d9',
+              dark: '#8a94a6',
+            },
+            obsidian: {
+              light: '#1a1a1a',
+              DEFAULT: '#0a0a0a',
+              dark: '#050505',
+            },
+            liquid: {
+              glass: 'rgba(255, 255, 255, 0.05)',
+              glassDark: 'rgba(0, 0, 0, 0.3)',
+            }
+          },
+          animation: {
+            'float': 'float 6s ease-in-out infinite',
+            'pulse-glass': 'pulse-glass 3s ease-in-out infinite',
+            'slide-up': 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-8px)' },
+            },
+            'pulse-glass': {
+              '0%, 100%': { opacity: '0.6' },
+              '50%': { opacity: '1' },
+            },
+            slideUp: {
+              '0%': { opacity: '0', transform: 'translateY(20px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-gray-50 text-gray-900 antialiased h-screen w-screen overflow-hidden transition-colors duration-500 font-sans selection:bg-blue-500 selection:text-white">
+
+  <!-- Capa de vidrio de fondo (Liquid Glass) -->
+  <div class="fixed inset-0 bg-[url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2574&auto=format&fit=crop')] bg-cover bg-center opacity-10 blur-[3px] pointer-events-none"></div>
+  <div class="fixed inset-0 bg-gradient-to-br from-transparent to-blue-50/20 pointer-events-none"></div>
+
+  <!-- ========== SIDEBAR (NAVEGACIÓN) ========== -->
+  <aside id="sidebar" class="fixed left-0 top-0 h-full w-64 bg-white/10 backdrop-blur-xl border-r border-white/20 z-40 transition-all duration-300 flex flex-col overflow-y-auto">
+    <div class="flex items-center justify-between h-16 border-b border-white/20 bg-white/5 px-4">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 bg-gradient-to-br from-blue-400 to-purple-500 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+        </div>
+        <span class="font-bold text-sm tracking-tight text-gray-800" id="sidebarBrand">AICascade</span>
+      </div>
+      <div class="w-6 h-6 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-[10px] font-bold shadow-sm">
+        AC
+      </div>
+    </div>
+
+    <nav class="flex-1 px-3 py-4 space-y-1">
+      <button onclick="app.switchPanel('dashboard')" class="nav-item w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all duration-200 bg-blue-50/50 text-blue-700 shadow-sm border border-blue-100/50" id="nav-dashboard">
+        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+        <span class="font-medium text-gray-800">Panel Principal</span>
+      </button>
+      <button onclick="app.switchPanel('providers')" class="nav-item w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all duration-200 text-gray-600 hover:bg-white/20 hover:text-gray-900" id="nav-providers">
+        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+        <span class="font-medium text-gray-800">Proveedores</span>
+      </button>
+      <button onclick="app.switchPanel('vault')" class="nav-item w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all duration-200 text-gray-600 hover:bg-white/20 hover:text-gray-900" id="nav-vault">
+        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        <span class="font-medium text-gray-800">Vault API</span>
+      </button>
+      <button onclick="app.switchPanel('chat')" class="nav-item w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all duration-200 text-gray-600 hover:bg-white/20 hover:text-gray-900" id="nav-chat">
+        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+        <span class="font-medium text-gray-800">Chat IA</span>
+      </button>
+      <button onclick="app.switchPanel('terminal')" class="nav-item w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all duration-200 text-gray-600 hover:bg-white/20 hover:text-gray-900" id="nav-terminal">
+        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+        <span class="font-medium text-gray-800">Terminal</span>
+      </button>
+      <button onclick="app.switchPanel('shortcuts')" class="nav-item w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all duration-200 text-gray-600 hover:bg-white/20 hover:text-gray-900" id="nav-shortcuts">
+        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+        <span class="font-medium text-gray-800">Atajos</span>
+      </button>
+    </nav>
+
+    <div class="p-4 border-t border-white/20">
+      <button id="btn-theme" class="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all duration-200 hover:bg-white/20">
+        <span class="theme-icon text-xl shrink-0">☀️</span>
+        <span id="themeLabel" class="font-medium text-gray-800">Modo Noche</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ========== CONTENIDO PRINCIPAL ========== -->
+  <main class="ml-64 h-full overflow-y-auto p-6 md:p-10 relative z-10">
+
+    <!-- Header superior -->
+    <header class="flex flex-col md:flex-row md:items-center justify-between mb-8 animate-slide-up">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900 tracking-tight" id="panelTitle">Panel Principal</h1>
+        <p class="text-gray-500 text-sm mt-1" id="panelSubtitle">Estado en tiempo real del sistema de cascada de IA</p>
+      </div>
+      <div class="flex items-center gap-3 mt-4 md:mt-0">
+        <button onclick="app.openPalette()" title="Command palette (Ctrl+K)" class="hidden sm:flex items-center gap-2 text-xs font-medium text-gray-500 px-3 py-1.5 rounded-full bg-white/50 border border-white/50 hover:bg-white/80 transition-all">
+          ⌘K <span class="hidden lg:inline">Comandos…</span>
+        </button>
+        <button onclick="app.openSettings()" title="Ajustes" class="hidden sm:flex items-center justify-center w-8 h-8 rounded-full bg-white/50 border border-white/50 hover:bg-white/80 transition-all">⚙️</button>
+        <div id="backendStatus" class="hidden sm:flex items-center gap-2 text-xs font-medium text-gray-500 px-3 py-1.5 rounded-full bg-white/50 border border-white/50">
+          <span class="w-2 h-2 rounded-full bg-gray-400"></span><span>Backend …</span>
+        </div>
+        <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold shadow-lg shadow-blue-500/30">AC</div>
+        <span class="hidden sm:block text-right">
+          <div class="text-sm font-medium text-gray-900" id="currentTime">00:00:00</div>
+          <div class="text-xs text-gray-500" id="currentDate">--/--/----</div>
+        </span>
+      </div>
+    </header>
+
+    <!-- ========== PANEL: DASHBOARD ========== -->
+    <section id="panel-dashboard" class="space-y-6">
+
+      <!-- Tarjeta estado cascada -->
+      <div class="glass-card p-6 rounded-2xl shadow-xl border border-white/40 animate-slide-up">
+        <div class="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6">
+          <div>
+            <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Cascada de IA</h2>
+            <p class="text-2xl font-bold text-gray-900 mt-1" id="activeModel">Ninguno</p>
+            <p class="text-sm text-gray-500 mt-1" id="activeTier">Sin asignar</p>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="cascade.runFailover()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-all shadow-lg shadow-blue-500/30 flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+              Forzar Conmutación
+            </button>
+            <button onclick="app.switchPanel('providers')" class="px-4 py-2 bg-white/50 hover:bg-white/70 text-gray-700 rounded-lg text-sm font-medium transition-all border border-white/50 flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.586m13.48 2.48a12 12 0 01-.348 1.574L20 17l-.586-1.586a6 6 0 10-8.486-8.486L12.414 3l1.586 1.586a6 6 0 100 8.486l-1.586 1.586z"></path></svg>
+              Proveedores
+            </button>
+          </div>
+        </div>
+
+        <!-- Medidor de tokens -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="glass-card p-5 rounded-xl border border-white/30">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-medium text-gray-500">Tokens Totales</span>
+              <span class="text-xs font-bold text-gray-900" id="totalTokens">0 / 0</span>
+            </div>
+            <div class="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
+              <div id="tokenBarTotal" class="bg-blue-500 h-full rounded-full transition-all duration-500 w-0"></div>
+            </div>
+            <p class="text-xs text-gray-400 mt-2">Uso general del sistema</p>
+          </div>
+          <div class="glass-card p-5 rounded-xl border border-white/30">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-medium text-gray-500">Tokens Restantes</span>
+              <span class="text-xs font-bold text-green-600" id="remainingTokens">0 (0%)</span>
+            </div>
+            <div class="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
+              <div id="tokenBarRemaining" class="bg-green-500 h-full rounded-full transition-all duration-500 w-100"></div>
+            </div>
+            <p class="text-xs text-gray-400 mt-2">Disponible antes de conmutar</p>
+          </div>
+          <div class="glass-card p-5 rounded-xl border border-white/30">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-medium text-gray-500">Estado</span>
+              <span class="flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse" id="statusDot"></span>
+                <span class="text-xs font-bold text-gray-700" id="statusText">Óptimo</span>
+              </span>
+            </div>
+            <div class="mt-2 flex items-center gap-2 text-xs">
+              <span class="px-2 py-1 rounded bg-blue-50 text-blue-700 font-medium text-xs">Conmutaciones: <span id="switchCount">0</span></span>
+              <span class="px-2 py-1 rounded bg-purple-50 text-purple-700 font-medium text-xs">Llamadas: <span id="callCount">0</span></span>
+            </div>
+            <div class="glass-card p-5 rounded-xl border border-white/30">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-medium text-gray-500">Métricas Reales</span>
+                <button onclick="cascade.resetUsage(); app.render();" title="Reiniciar contadores" class="text-xs text-gray-400 hover:text-gray-700">↺ reset</button>
+              </div>
+              <div class="mt-2 flex flex-wrap items-center gap-2 text-xs" id="metricsRow">
+                <span class="px-2 py-1 rounded bg-emerald-50 text-emerald-700 font-medium">Lat media: <span id="metricLatency">0ms</span></span>
+                <span class="px-2 py-1 rounded bg-amber-50 text-amber-700 font-medium">Errores: <span id="metricErrors">0%</span></span>
+                <span class="px-2 py-1 rounded bg-slate-100 text-slate-700 font-medium">Tokens I/O: <span id="metricIO">0/0</span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Visor jerárquico de modelos -->
+        <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="glass-card p-5 rounded-xl border border-white/30 model-tier tier-1 relative overflow-hidden group">
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-purple-600 opacity-20"></div>
+            <h3 class="text-xs font-bold text-blue-600 uppercase tracking-wider mb-3 flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+              Nivel 1 — Ultra
+            </h3>
+            <ul class="space-y-2 text-sm text-gray-600" id="tier1Models">
+              <!-- Se llena por JS -->
+            </ul>
+          </div>
+          <div class="glass-card p-5 rounded-xl border border-white/30 model-tier tier-2 relative overflow-hidden group">
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-400 to-orange-500 opacity-20"></div>
+            <h3 class="text-xs font-bold text-amber-600 uppercase tracking-wider mb-3 flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+              Nivel 2 — Mid
+            </h3>
+            <ul class="space-y-2 text-sm text-gray-600" id="tier2Models"></ul>
+          </div>
+          <div class="glass-card p-5 rounded-xl border border-white/30 model-tier tier-3 relative overflow-hidden group">
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-400 to-emerald-500 opacity-20"></div>
+            <h3 class="text-xs font-bold text-green-600 uppercase tracking-wider mb-3 flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-green-500"></span>
+              Nivel 3 — Light
+            </h3>
+            <ul class="space-y-2 text-sm text-gray-600" id="tier3Models"></ul>
+          </div>
+        </div>
+
+        <!-- Registro de actividad -->
+        <div class="mt-8 glass-card p-5 rounded-xl border border-white/30">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-sm font-bold text-gray-700">Registro de Actividad</h3>
+            <span class="text-xs text-gray-400">Últimos eventos</span>
+          </div>
+          <div class="h-40 overflow-y-auto space-y-2" id="activityLog">
+            <div class="flex items-start gap-3 text-sm">
+              <div class="w-2 h-2 rounded-full bg-green-400 mt-1 flex-shrink-0"></div>
+              <div>
+                <div class="text-gray-700 font-medium">Sistema iniciado</div>
+                <div class="text-gray-500 text-xs">Gestor de cascada listo</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ========== PANEL: CHAT IA (Backend con failover) ========== -->
+    <section id="panel-chat" class="hidden space-y-6">
+      <div class="glass-card p-6 rounded-2xl shadow-xl border border-white/40 animate-slide-up">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h2 class="text-lg font-bold text-gray-900">Chat IA — Cascada con Failover</h2>
+            <p class="text-gray-500 text-sm">Usa el backend FastAPI (OpenAI → DeepSeek → Ollama → simulado)</p>
+          </div>
+          <span id="chatMode" class="text-xs font-medium px-2.5 py-1 rounded-full bg-gray-100 text-gray-600">modo: local</span>
+        </div>
+        <div id="chatLog" class="h-64 overflow-y-auto space-y-3 p-4 rounded-xl bg-black/5 border border-white/30 mb-4"></div>
+        <div class="flex gap-2">
+          <input id="chatInput" type="text" placeholder="Escribe tu mensaje y pulsa Enter…"
+            class="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 bg-white/80 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50">
+          <button onclick="app.sendChat()" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-medium transition-all shadow-lg shadow-blue-500/30">Enviar</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== PANEL: PROVEEDORES ========== -->
+    <section id="panel-providers" class="hidden space-y-6">
+      <div class="glass-card p-6 rounded-2xl shadow-xl border border-white/40 animate-slide-up">
+        <h2 class="text-lg font-bold text-gray-900 mb-6">Proveedores de IA</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="providersGrid">
+          <!-- Llenado por JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== PANEL: VAULT API ========== -->
+    <section id="panel-vault" class="hidden space-y-6">
+      <div class="glass-card p-6 rounded-2xl shadow-xl border border-white/40 animate-slide-up">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+          <div>
+            <h2 class="text-lg font-bold text-gray-900">Vault de Credenciales</h2>
+            <p class="text-gray-500 text-sm">Almacena y gestiona tus claves de API de forma local</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <input id="vaultSearch" type="text" placeholder="Buscar proveedor…" oninput="vault.search(this.value)"
+              class="px-3 py-2 rounded-lg border border-gray-200 bg-white/80 text-sm w-44 focus:outline-none focus:ring-2 focus:ring-blue-500/50">
+            <button onclick="vault.exportKeys()" title="Exportar backup JSON" class="px-3 py-2 glass-card rounded-lg text-sm font-medium transition-all hover:scale-[1.03]">⤓ Export</button>
+            <label class="px-3 py-2 glass-card rounded-lg text-sm font-medium cursor-pointer transition-all hover:scale-[1.03]">⤒ Import
+              <input type="file" accept=".json,application/json" class="hidden" onchange="vault.importKeys(this.files[0]); this.value=''">
+            </label>
+            <button onclick="vault.showAddForm()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-all shadow-lg shadow-blue-500/30">
+              + Agregar Clave
+            </button>
+          </div>
+        </div>
+        <div class="space-y-3" id="vaultList">
+          <!-- Llenado por JS -->
+        </div>
+        <div id="vaultForm" class="hidden glass-card p-5 rounded-xl border border-blue-200/50 mt-6 animate-slide-up">
+          <h3 class="text-sm font-bold text-blue-900 mb-3">Nueva Credencial</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label class="block text-xs font-medium text-gray-600 mb-1">Proveedor</label>
+              <select id="vaultProvider" class="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white/80 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50">
+                <option value="openai">OpenAI</option>
+                <option value="anthropic">Anthropic</option>
+                <option value="google">Google Gemini</option>
+                <option value="ollama">Ollama (Local)</option>
+                <option value="deepseek">DeepSeek</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-600 mb-1">Clave API</label>
+              <input type="password" id="vaultKey" placeholder="sk-..." class="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white/80 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50">
+            </div>
+          </div>
+          <div class="flex justify-end gap-2">
+            <button onclick="vault.hideAddForm()" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg text-sm transition-colors">Cancelar</button>
+            <button onclick="vault.saveKey()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-all shadow-md">Guardar</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== PANEL: TERMINAL ========== -->
+    <section id="panel-terminal" class="hidden space-y-6">
+      <div class="glass-card p-0 rounded-2xl shadow-2xl border border-white/40 animate-slide-up h-[70vh] flex flex-col">
+        <div class="p-4 bg-gray-900/80 backdrop-blur-md border-b border-white/10 rounded-t-2xl flex justify-between items-center">
+          <div class="flex items-center gap-2">
+            <div class="w-3 h-3 rounded-full bg-red-500"></div>
+            <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+            <div class="w-3 h-3 rounded-full bg-green-500"></div>
+            <span class="ml-3 text-xs font-mono text-gray-400">bash — super-admin</span>
+          </div>
+          <div class="flex gap-1">
+            <button class="w-6 h-6 rounded-full bg-gray-700 hover:bg-gray-600 text-xs text-gray-300 flex items-center justify-center transition-colors">_</button>
+            <button class="w-6 h-6 rounded-full bg-gray-700 hover:bg-gray-600 text-xs text-gray-300 flex items-center justify-center transition-colors">□</button>
+            <button class="w-6 h-6 rounded-full bg-gray-700 hover:bg-gray-600 text-xs text-gray-300 flex items-center justify-center transition-colors">✕</button>
+          </div>
+        </div>
+        <div class="flex-1 bg-gray-900 text-green-400 font-mono text-sm p-4 overflow-y-auto font-mono" id="terminalOutput">
+          <div class="text-blue-400">> AICascade Terminal v1.0.0 — Modo Super Admin</div>
+          <div class="text-gray-500">> Tipo 'help' para ver comandos disponibles</div>
+          <div class="mt-2 text-gray-500">> $</div>
+        </div>
+        <div class="p-4 border-t border-white/10 bg-gray-900/50 backdrop-blur-md rounded-b-2xl">
+          <input type="text" id="terminalInput" placeholder="Ejecutar comando..." class="w-full bg-transparent text-green-400 font-mono text-sm outline-none placeholder-gray-600" autocomplete="off">
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== PANEL: ATAJOS ========== -->
+    <section id="panel-shortcuts" class="hidden space-y-6">
+      <div class="glass-card p-6 rounded-2xl shadow-xl border border-white/40 animate-slide-up">
+        <h2 class="text-lg font-bold text-gray-900 mb-6">Atajos del Sistema</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="glass-card p-5 rounded-xl border border-white/30 text-center hover:scale-[1.02] transition-transform cursor-pointer group" onclick="app.openVSCode()">
+            <div class="w-12 h-12 bg-blue-600/20 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-blue-600/30 transition-colors">
+              <svg class="w-6 h-6 text-blue-600 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+            </div>
+            <h3 class="font-semibold text-gray-900 mb-1">VS Code</h3>
+            <p class="text-xs text-gray-500">Abrir editor de código</p>
+          </div>
+          <div class="glass-card p-5 rounded-xl border border-white/30 text-center hover:scale-[1.02] transition-transform cursor-pointer group" onclick="app.openGitHub()">
+            <div class="w-12 h-12 bg-gray-900/20 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-gray-900/30 transition-colors">
+              <svg class="w-6 h-6 text-gray-900 group-hover:text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7.59 0-4.28-4.48-8.28-10.05-8.28A11.97 11.97 0 002 9c0 5.59 4.56 10.52 10 10.94M15 15l-3 3m0 0l-3 3m3-3v-3m0 0l3 3m-3-3V3"></path></svg>
+            </div>
+            <h3 class="font-semibold text-gray-900 mb-1">GitHub</h3>
+            <p class="text-xs text-gray-500">Repositorios del proyecto</p>
+          </div>
+          <div class="glass-card p-5 rounded-xl border border-white/30 text-center hover:scale-[1.02] transition-transform cursor-pointer group" onclick="app.openCascadeFolder()">
+            <div class="w-12 h-12 bg-purple-600/20 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-purple-600/30 transition-colors">
+              <svg class="w-6 h-6 text-purple-600 group-hover:text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
+            </div>
+            <h3 class="font-semibold text-gray-900 mb-1">Carpeta Proyecto</h3>
+            <p class="text-xs text-gray-500">AICascadeWidget en documentos</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Notificación flotante -->
+    <div id="toast" class="fixed bottom-6 right-6 glass-card px-4 py-3 rounded-xl shadow-xl border border-white/40 transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+      <div class="flex items-start gap-3">
+        <div class="w-2 h-2 rounded-full bg-green-400 mt-1"></div>
+        <div>
+          <div class="text-sm font-medium text-gray-900" id="toastTitle">Éxito</div>
+          <div class="text-xs text-gray-500" id="toastMsg">Operación completada</div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="js/cascade.js?v=20261019b"></script>
+  <script src="js/vault.js?v=20261019b"></script>
+  <script src="js/terminal.js?v=20261019b"></script>
+  <script src="js/backend.js?v=20261019b"></script>
+  <script src="js/palette.js?v=20261019b"></script>
+  <script src="js/settings.js?v=20261019b"></script>
+  <script src="js/app.js?v=20261019b"></script>
+  <script>
+    // Registrar service worker solo en http(s), no en file://
+    if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+      });
+    }
+  </script>
+
+</body>
+</html>
