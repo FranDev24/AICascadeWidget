@@ -377,6 +377,13 @@ const app = {
 // Exponer global para onclick="app.*" (los botones del HTML lo necesitan)
 window.app = app;
 
+// Función global para onchange="toggleTheme()" del checkbox #themeCheckbox
+window.toggleTheme = function () {
+  if (window.app && typeof window.app.toggleTheme === 'function') {
+    window.app.toggleTheme();
+  }
+};
+
 // Inicializar cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', () => {
   app.initTheme();

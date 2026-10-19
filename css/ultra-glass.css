@@ -297,3 +297,161 @@ main section:not(.hidden) > div.glass-card:nth-child(4) { animation-delay: .18s;
   [data-theme="night"] body { color: var(--p18-title-night, #F5F5F7) !important; }
 }
 body { font-family: -apple-system, 'SF Pro Text', 'Inter', system-ui, sans-serif !important; }
+
+/* ============================================================================
+   UV-06 · TOGGLE ESFÉRICO CRISTAL 3D — iPhone 18 Pro Día/Noche (UIverse)
+   Estructura: #themeCheckbox (input), .toggle, .button, #themeIconLabel.
+   Colores adaptados a iPhone 18 Pro Plata (día) y Obsidiana (noche).
+   ============================================================================ */
+
+.theme-toggle-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 6px 0;
+  overflow: visible;
+}
+
+/* Contenedor píldora del toggle */
+.toggle {
+  position: relative;
+  width: 96px;
+  height: 48px;
+  border-radius: 9999px;
+  flex-shrink: 0;
+  /* Día: plata pulido */
+  background: linear-gradient(180deg, rgba(255,255,255,0.55), rgba(255,255,255,0.25));
+  border: 1px solid rgba(255,255,255,0.65);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.9),
+    0 4px 12px rgba(15,23,42,0.10);
+  transition: background .45s cubic-bezier(0.16,1,0.3,1), border-color .45s ease, box-shadow .45s ease;
+}
+
+[data-theme="night"] .toggle {
+  /* Noche: obsidiana negra */
+  background: linear-gradient(180deg, rgba(0,0,0,0.72), rgba(0,0,0,0.55));
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.08),
+    0 4px 14px rgba(0,0,0,0.60);
+}
+
+/* Input oculto — zona táctil sobre todo el toggle */
+.toggle input {
+  opacity: 0;
+  position: absolute;
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+/* Esfera/knob central — cristal 3D */
+.toggle .button {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+  line-height: 1;
+  z-index: 2;
+  /* Día: titanio plata */
+  background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 45%, #e2e8f0 100%);
+  box-shadow:
+    0 15px 25px -4px rgba(15,23,42,0.30),
+    inset 0 -3px 4px -1px rgba(0,0,0,0.15),
+    0 -10px 15px -1px rgba(255,255,255,0.80),
+    inset 0 3px 4px -1px rgba(255,255,255,0.40),
+    inset 0 0 5px 1px rgba(255,255,255,0.90),
+    inset 0 20px 30px 0 rgba(255,255,255,0.30),
+    0 0 0 1px rgba(15,23,42,0.08);
+  transition: left .4s cubic-bezier(0.23, 1, 0.32, 1),
+              background .5s ease,
+              box-shadow .4s cubic-bezier(0.16,1,0.3,1),
+              transform .25s cubic-bezier(0.16,1,0.3,1);
+}
+
+[data-theme="night"] .toggle .button {
+  left: 52px; /* 96 - 40 - 4 */
+  /* Noche: titanio negro cepillado */
+  background: linear-gradient(180deg, #3b3f47 0%, #20232a 50%, #101216 100%);
+  box-shadow:
+    0 10px 25px -4px rgba(0,0,0,0.50),
+    inset 0 -8px 25px -1px rgba(255,255,255,0.10),
+    0 -10px 15px -1px rgba(255,255,255,0.08),
+    inset 0 8px 20px 0 rgba(0,0,0,0.30),
+    inset 0 0 5px 1px rgba(255,255,255,0.06),
+    0 0 0 1px rgba(255,255,255,0.07);
+}
+
+/* Label / icono día/noche centrado detrás de la esfera */
+.toggle .label {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  text-align: center;
+  line-height: 48px;
+  font-size: 20px;
+  font-weight: 700;
+  z-index: 1;
+  pointer-events: none;
+  user-select: none;
+  transition: color .3s ease, opacity .3s ease;
+}
+
+[data-theme="day"] .toggle .label {
+  color: var(--p18-title-day, #1A1D24);
+  opacity: 0.95;
+}
+
+[data-theme="night"] .toggle .label {
+  color: var(--p18-title-night, #F5F7FA);
+  opacity: 0.95;
+}
+
+/* Cuando checked (noche): mover esfera a la derecha y cambiar color del label */
+.toggle input:checked ~ .button {
+  left: 4px;
+  background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 45%, #e2e8f0 100%);
+}
+
+[data-theme="night"] .toggle input:checked ~ .button {
+  left: 52px;
+  background: linear-gradient(180deg, #3b3f47 0%, #20232a 50%, #101216 100%);
+}
+
+.toggle input:checked ~ .label {
+  color: rgba(11,132,255,0.85);
+}
+
+[data-theme="day"] .toggle input:checked ~ .label {
+  color: rgba(255,159,10,0.85);
+}
+
+/* Presión física: hundimiento de la esfera (input:active) */
+.toggle input:active ~ .button {
+  filter: blur(0.5px);
+  transform: scale(0.90);
+}
+
+/* Hover: micro-lift de la esfera */
+@media (hover: hover) {
+  .toggle:hover .button {
+    transform: scale(1.08);
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .toggle .button,
+  .toggle .label { transition: none !important; }
+  .toggle input:active ~ .button { transform: none !important; filter: none !important; }
+}
