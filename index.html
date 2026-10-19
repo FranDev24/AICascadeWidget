@@ -32,8 +32,9 @@
   <link rel="stylesheet" href="css/ultra-glass.css?v=20261019f">
   <link rel="stylesheet" href="css/iphone18pro.css?v=p18a">
   <link rel="stylesheet" href="css/18pro-finish.css?v=f1">
-  <link rel="stylesheet" href="css/uiverse-packs.css?v=uvp1">
+  <link rel="stylesheet" href="css/uiverse-packs.css?v=uvp2">
   <link rel="stylesheet" href="css/uiverse-integrate.css?v=uv1">
+  <link rel="stylesheet" href="css/18pro-sphere.css?v=s1">
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -83,20 +84,40 @@
     }
   </script>
 </head>
-<body class="bg-gray-50 text-gray-900 antialiased h-screen w-screen overflow-hidden transition-colors duration-500 font-sans selection:bg-blue-500 selection:text-white">
+<body class="antialiased h-screen w-screen overflow-hidden transition-colors duration-500 font-sans selection:bg-blue-500 selection:text-white" style="background: var(--p18-day-base-a, #F2F4F8); color: var(--p18-title-day, #1A1D24);">
+
+  <!-- iPhone Status Bar (notch + hora + señal + batería) — Paleta iPhone 18 Pro -->
+  <div id="statusBar" class="fixed top-0 left-0 right-0 h-10 z-[60] pointer-events-none lg:hidden" style="color: var(--p18-title-day, #1A1D24);">
+    <div class="flex items-center justify-between px-4 py-1 text-[10px] font-medium tracking-tight">
+      <div class="flex items-center gap-1">
+        <div class="w-2 h-2 rounded-full bg-gray-400/60"></div>
+        <div class="w-1 h-2 rounded-full bg-gray-400/60"></div>
+        <div class="w-2 h-2 rounded-full bg-gray-400/60"></div>
+        <span class="ml-1" style="color: var(--p18-sub-day, #5A6275);">LTE</span>
+      </div>
+      <span id="statusTime" class="font-semibold">12:41</span>
+      <div class="flex items-center gap-0.5">
+        <div class="w-0.5 h-2.5 rounded-full bg-gray-400/60"></div>
+        <div class="w-1.5 h-2.5 rounded-full bg-gray-400/60"></div>
+        <div class="w-2.5 h-2.5 rounded-full bg-gray-400/60"></div>
+        <div class="w-0.5 h-2.5 rounded-full bg-gray-400/60"></div>
+        <div class="w-5 h-2.5 rounded-full bg-gray-400/60"></div>
+      </div>
+    </div>
+  </div>
 
   <!-- Wallpaper mesh iOS 18 + gradiente superior -->
   <div id="iosWallpaper" aria-hidden="true"></div>
 
 
-  <!-- ========== SIDEBAR (NAVEGACIÓN iOS) ========== -->
-  <aside id="sidebar" class="fixed left-0 top-0 h-full w-64 bg-white/10 backdrop-blur-2xl border-r border-white/20 z-40 transition-all duration-300 flex flex-col overflow-y-auto">
-    <div class="flex items-center justify-between h-16 border-b border-white/20 bg-white/5 px-4">
+  <!-- ========== SIDEBAR (NAVEGACIÓN iOS — solo desktop) ========== -->
+  <aside id="sidebar" class="fixed left-0 top-0 h-full w-64 bg-white/10 backdrop-blur-2xl border-r border-white/20 z-40 transition-all duration-300 flex flex-col overflow-y-auto hidden lg:block" style="background: var(--p18-glass-day, rgba(255,255,255,0.68)); border-color: var(--p18-bezel-day, rgba(255,255,255,0.95));">
+    <div class="flex items-center justify-between h-16 border-b border-white/20 bg-white/5 px-4" style="border-color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.35);">
       <div class="flex items-center gap-3">
         <div class="w-9 h-9 bg-gradient-to-br from-blue-400 to-purple-500 rounded-[0.8rem] flex items-center justify-center shadow-lg shadow-blue-500/30">
           <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
         </div>
-        <span class="font-bold text-sm tracking-tight text-gray-800" id="sidebarBrand">AICascade</span>
+        <span class="font-bold text-sm tracking-tight text-gray-800" id="sidebarBrand" style="color: var(--p18-title-day, #1A1D24);">AICascade</span>
       </div>
       <div class="w-6 h-6 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-[10px] font-bold shadow-sm">
         AC
@@ -130,26 +151,23 @@
       </button>
     </nav>
 
-    <div class="p-4 border-t border-white/20">
-      <button id="btn-theme" class="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all duration-200 hover:bg-white/20">
-        <span class="theme-icon text-xl shrink-0">☀️</span>
-        <span id="themeLabel" class="font-medium text-gray-800">Modo Noche</span>
-      </button>
+    <div class="p-4 border-t border-white/20 flex items-center justify-center">
+      <span class="text-[10px] uppercase tracking-[0.16em] text-gray-400 font-semibold select-none">AICascade · v2.1</span>
     </div>
   </aside>
 
   <!-- ========== CONTENIDO PRINCIPAL ========== -->
-  <main class="ml-64 h-full overflow-y-auto p-6 md:p-10 relative z-10">
+  <main class="lg:ml-64 h-full overflow-y-auto p-6 md:p-10 relative z-10">
 
     <!-- Header superior -->
     <header class="flex flex-col md:flex-row md:items-center justify-between mb-8 animate-slide-up gap-3">
       <div>
-        <h1 class="text-[1.65rem] font-bold text-gray-900 tracking-tight ios-clean-title" id="panelTitle">Panel Principal</h1>
-        <p class="text-gray-500 text-sm mt-0.5" id="panelSubtitle">Estado en tiempo real del sistema de cascada de IA</p>
+        <h1 class="text-[1.65rem] font-bold tracking-tight ios-clean-title" id="panelTitle" style="color: var(--p18-title-day, #1A1D24);">Panel Principal</h1>
+        <p class="text-sm mt-0.5" id="panelSubtitle" style="color: var(--p18-sub-day, #5A6275);">Estado en tiempo real del sistema de cascada de IA</p>
       </div>
       <div class="flex items-center gap-3 mt-4 md:mt-0">
         <!-- Dynamic Island (centro) -->
-        <div class="dynamic-island hidden md:inline-flex ml-auto mr-2" id="dynamicIsland" data-state="offline" title="Estado del sistema">
+        <div class="dynamic-island inline-flex ml-auto mr-2 mt-4 md:mt-0" id="dynamicIsland" data-state="offline" title="Estado del sistema">
           <span class="di-dot"></span>
           <span class="di-label text-[10px] uppercase tracking-[0.14em] font-semibold">Cascade</span>
           <span class="di-sep"></span>
@@ -160,6 +178,17 @@
           ⌘K <span class="hidden lg:inline">Comandos…</span>
         </button>
         <button onclick="app.openSettings()" data-tip="Ajustes" title="Ajustes" class="hidden sm:flex items-center justify-center w-8 h-8 rounded-full bg-white/50 border border-white/50 hover:bg-white/80 transition-all duration-300">⚙️</button>
+
+        <!-- Interruptor esférico 3D de tema (Uverse físico: Plata ⇄ Titanio) -->
+        <button id="btn-theme" title="Cambiar tema Día (Plata) / Noche (Titanio)"
+          class="p18-sphere-toggle flex items-center gap-2.5 pl-1.5 pr-3 py-1.5 rounded-full transition-all duration-300">
+          <span class="p18-switch" aria-hidden="true">
+            <span class="p18-glyph p18-glyph-sun">☀️</span>
+            <span class="p18-glyph p18-glyph-moon">🌙</span>
+            <span class="p18-sphere"><span class="theme-icon">☀️</span></span>
+          </span>
+          <span id="themeLabel" class="hidden xl:inline text-xs font-semibold text-gray-600">Modo Noche</span>
+        </button>
         <div id="backendStatus" class="hidden sm:flex items-center gap-2 text-xs font-medium text-gray-500 px-3 py-1.5 rounded-full bg-white/50 border border-white/50">
           <span class="w-2 h-2 rounded-full bg-gray-400"></span><span>Backend …</span>
         </div>
@@ -174,8 +203,8 @@
     <!-- ========== PANEL: DASHBOARD (GRID iOS DE WIDGETS) ========== -->
     <section id="panel-dashboard" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
 
-      <!-- WIDGET HERO: Estado de la cascada + Gauge circular -->
-      <div class="glass-card p-6 md:col-span-2 lg:col-span-3 ios-hero-glow animate-slide-up">
+      <!-- WIDGET HERO: Estado de la cascada + Gauge circular — UIverse beam-card (borde luz rotativo) -->
+      <div class="glass-card p-6 md:col-span-2 lg:col-span-3 ios-hero-glow animate-slide-up beam-card">
         <div class="relative z-[3] flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div class="min-w-0">
             <span class="ios-chip mb-3">
@@ -185,11 +214,11 @@
             <p class="text-[1.9rem] leading-tight font-bold text-gray-900 tracking-tight break-words ios-clean-title" id="activeModel">Ninguno</p>
             <p class="text-sm text-gray-500 mt-1" id="activeTier">Sin asignar</p>
             <div class="flex flex-wrap items-center gap-2 mt-4">
-              <button onclick="cascade.runFailover()" class="ios-btn ios-btn-primary">
+              <button onclick="cascade.runFailover()" class="ios-btn ios-btn-primary uv-btn">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                 Forzar Conmutación
               </button>
-              <button onclick="app.switchPanel('providers')" class="ios-btn ios-btn-secondary">
+              <button onclick="app.switchPanel('providers')" class="ios-btn ios-btn-secondary uv-btn">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.586m13.48 2.48a12 12 0 01-.348 1.574L20 17l-.586-1.586a6 6 0 10-8.486-8.486L12.414 3l1.586 1.586a6 6 0 100 8.486l-1.586 1.586z"></path></svg>
                 Proveedores
               </button>
@@ -370,9 +399,13 @@
         </div>
         <div id="chatLog" class="h-64 overflow-y-auto space-y-3 p-4 rounded-2xl mb-4 border" style="background:var(--ios-pill);border-color:var(--ios-glass-border);"></div>
         <div class="flex gap-2">
+          <div class="uv-seg">
+            <button class="is-on" title="Modo Local">Local</button>
+            <button title="Modo Cascada">Cascada</button>
+          </div>
           <input id="chatInput" type="text" placeholder="Escribe tu mensaje y pulsa Enter…"
             class="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 bg-white/80 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50">
-          <button onclick="app.sendChat()" class="ios-btn ios-btn-primary">Enviar</button>
+          <button onclick="app.sendChat()" class="ios-btn ios-btn-primary uv-btn">Enviar</button>
         </div>
       </div>
     </section>
@@ -388,6 +421,7 @@
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="providersGrid">
           <!-- Llenado por JS -->
+          <div class="uv-loader" id="providersLoader" style="display:none;"></div>
         </div>
       </div>
     </section>
@@ -408,11 +442,11 @@
           <div class="flex flex-wrap items-center gap-2">
             <input id="vaultSearch" type="text" placeholder="Buscar proveedor…" oninput="vault.search(this.value)"
               class="px-3 py-2 rounded-lg border border-gray-200 bg-white/80 text-sm w-44 focus:outline-none focus:ring-2 focus:ring-blue-500/50">
-            <button onclick="vault.exportKeys()" title="Exportar backup JSON" class="ios-btn ios-btn-secondary !px-3.5 !py-2 !text-xs">⤓ Export</button>
-            <label class="ios-btn ios-btn-secondary !px-3.5 !py-2 !text-xs cursor-pointer">⤒ Import
+            <button onclick="vault.exportKeys()" title="Exportar backup JSON" class="ios-btn ios-btn-secondary uv-btn !px-3.5 !py-2 !text-xs">⤓ Export</button>
+            <label class="ios-btn ios-btn-secondary uv-btn !px-3.5 !py-2 !text-xs cursor-pointer">⤒ Import
               <input type="file" accept=".json,application/json" class="hidden" onchange="vault.importKeys(this.files[0]); this.value=''">
             </label>
-            <button onclick="vault.showAddForm()" class="ios-btn ios-btn-primary !px-3.5 !py-2 !text-xs">+ Agregar Clave</button>
+            <button onclick="vault.showAddForm()" class="ios-btn ios-btn-primary uv-btn !px-3.5 !py-2 !text-xs">+ Agregar Clave</button>
           </div>
         </div>
         <div class="space-y-3" id="vaultList">
@@ -513,6 +547,32 @@
     </div>
 
   </main>
+
+  <!-- iOS Bottom Tab Bar — Paleta iPhone 18 Pro -->
+  <nav id="bottomTabBar" class="fixed bottom-0 left-0 right-0 h-16 border-t border-white/30 bg-white/70 backdrop-blur-xl z-50 lg:hidden" style="background: var(--p18-glass-day, rgba(255,255,255,0.75)); border-color: rgba(255,255,255,0.5);">
+    <div class="flex items-center justify-between px-4 py-2">
+      <button onclick="app.switchPanel('dashboard')" class="tab-item flex flex-col items-center justify-center gap-1" id="tab-dashboard" style="color: var(--p18-blue-day, #007AFF);">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--p18-blue-day, #007AFF);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+        <span class="text-[10px] font-semibold" style="color: var(--p18-blue-day, #007AFF);">Dashboard</span>
+      </button>
+      <button onclick="app.switchPanel('providers')" class="tab-item flex flex-col items-center justify-center gap-1" id="tab-providers" style="color: var(--p18-sub-day, #5A6275);">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--p18-sub-day, #5A6275);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+        <span class="text-[10px] font-semibold" style="color: var(--p18-sub-day, #5A6275);">Proveedores</span>
+      </button>
+      <button onclick="app.switchPanel('vault')" class="tab-item flex flex-col items-center justify-center gap-1" id="tab-vault" style="color: var(--p18-sub-day, #5A6275);">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--p18-sub-day, #5A6275);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        <span class="text-[10px] font-semibold" style="color: var(--p18-sub-day, #5A6275);">Vault</span>
+      </button>
+      <button onclick="app.switchPanel('chat')" class="tab-item flex flex-col items-center justify-center gap-1" id="tab-chat" style="color: var(--p18-sub-day, #5A6275);">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--p18-sub-day, #5A6275);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+        <span class="text-[10px] font-semibold" style="color: var(--p18-sub-day, #5A6275);">Chat</span>
+      </button>
+      <button onclick="app.switchPanel('terminal')" class="tab-item flex flex-col items-center justify-center gap-1" id="tab-terminal" style="color: var(--p18-sub-day, #5A6275);">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--p18-sub-day, #5A6275);"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+        <span class="text-[10px] font-semibold" style="color: var(--p18-sub-day, #5A6275);">Terminal</span>
+      </button>
+    </div>
+  </nav>
 
   <script src="js/cascade.js?v=20261019b"></script>
   <script src="js/vault.js?v=20261019b"></script>
@@ -693,5 +753,51 @@
     })();
   </script>
 
+  <script>
+    // iOS Status Bar: reloj
+    (function(){
+      var el = document.getElementById('statusTime');
+      if(!el) return;
+      function tick(){
+        var n = new Date();
+        el.textContent = String(n.getHours()).padStart(2,'0') + ':' + String(n.getMinutes()).padStart(2,'0');
+      }
+      tick(); setInterval(tick, 60000);
+    })();
+
+    // Tab bar inferior: sincronizar con app.switchPanel (aditivo, no toca logica original)
+// Usa variables CSS de iPhone 18 Pro (--p18-blue-day / --p18-sub-day) por tema
+    (function(){
+      var orig = app.switchPanel;
+      var accentDay = getComputedStyle(document.documentElement).getPropertyValue('--p18-blue-day').trim() || '#007AFF';
+      var subDay = getComputedStyle(document.documentElement).getPropertyValue('--p18-sub-day').trim() || '#5A6275';
+      var accentNight = getComputedStyle(document.documentElement).getPropertyValue('--p18-blue-night').trim() || '#0B84FF';
+      var subNight = getComputedStyle(document.documentElement).getPropertyValue('--p18-sub-night').trim() || '#8E95A5';
+      function isNight(){ return document.documentElement.getAttribute('data-theme') === 'night'; }
+      function setTabStyles(el, active){
+        if(active){
+          el.style.color = isNight() ? accentNight : accentDay;
+          var svg = el.querySelector('svg');
+          if(svg) svg.style.color = isNight() ? accentNight : accentDay;
+        } else {
+          el.style.color = isNight() ? subNight : subDay;
+          var svg = el.querySelector('svg');
+          if(svg) svg.style.color = isNight() ? subNight : subDay;
+        }
+      }
+      app.switchPanel = function(panel){
+        orig.call(app, panel);
+        document.querySelectorAll('#bottomTabBar .tab-item').forEach(function(el){
+          setTabStyles(el, false);
+        });
+        var active = document.getElementById('tab-' + panel);
+        if(active){ setTabStyles(active, true); }
+      };
+    })();
+  </script>
+  <script>
+    // Alias público del conmutador de tema (compatible con onclick/onchange externos)
+    window.toggleTheme = function () { if (window.app) app.toggleTheme(); };
+  </script>
 </body>
 </html>

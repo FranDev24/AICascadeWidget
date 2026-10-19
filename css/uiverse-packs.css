@@ -59,4 +59,106 @@
 .uv-toggle { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; }
 .uv-toggle input { accent-color: var(--ios-accent, #0B84FF); width: 18px; height: 18px; }
 
+/* ==================================================================
+   UV-05 · INTERRUPTOR FÍSICO DÍA/NOCHE (iPhone 18 Pro)
+   Basado en el toggle físico Uiverse (sombras internas multi-capa,
+   presión con hundimiento real). Plata = día · Titanio = noche.
+   Hooks JS preservados: #btn-theme (click) · .theme-icon (emoji por
+   app.js) · posición del knob vía [data-theme] (sin JS).
+   ================================================================== */
+.p18-switch {
+  position: relative;
+  width: 84px; height: 42px;
+  border-radius: 9999px;
+  flex-shrink: 0;
+  /* Ranura hundida (groove) — modo día */
+  background: linear-gradient(180deg, rgba(15,23,42,0.10), rgba(15,23,42,0.16));
+  box-shadow:
+    inset 0 2px 6px rgba(15,23,42,0.28),
+    inset 0 -1px 0 rgba(255,255,255,0.9),
+    0 1px 0 rgba(255,255,255,0.8);
+  transition: background .5s cubic-bezier(0.16,1,0.3,1), box-shadow .5s cubic-bezier(0.16,1,0.3,1);
+}
+[data-theme="night"] .p18-switch {
+  background: linear-gradient(180deg, rgba(0,0,0,0.66), rgba(0,0,0,0.5));
+  box-shadow:
+    inset 0 2px 6px rgba(0,0,0,0.75),
+    inset 0 -1px 0 rgba(255,255,255,0.08),
+    0 1px 0 rgba(255,255,255,0.06);
+}
+
+/* Glifos del fondo (el modo "otro") */
+.p18-glyph {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  font-size: 15px; line-height: 1; opacity: 0; pointer-events: none;
+  transition: opacity .45s ease .1s, filter .45s ease;
+  filter: grayscale(0.3);
+}
+.p18-glyph-sun  { right: 12px; }   /* día: knob a la IZQ → sol expuesto derecha */
+.p18-glyph-moon { left: 13px; }    /* noche: knob a la DER → luna expuesto izquierda */
+
+/* Knob físico (material del código de referencia) */
+.p18-knob {
+  position: absolute; top: 3px; left: 3px;
+  width: 36px; height: 36px; border-radius: 50%;
+  display: grid; place-items: center;
+  font-size: 17px; line-height: 1;
+  transition: left .38s cubic-bezier(0.23, 1, 0.32, 1), background .5s ease, box-shadow .38s ease;
+  /* DÍA: titanio plata pulido (insets del material original) */
+  background: linear-gradient(180deg, #fdfdfe 0%, #e9edf3 60%, #dde3ec 100%);
+  box-shadow:
+    0 6px 12px -2px rgba(15,23,42,0.35),
+    inset 0 -3px 4px -1px rgba(15,23,42,0.18),
+    0 -6px 10px -2px rgba(255,255,255,0.95),
+    inset 0 3px 4px -1px rgba(255,255,255,0.95),
+    inset 0 0 5px 1px rgba(255,255,255,0.9),
+    inset 0 10px 16px 0 rgba(255,255,255,0.35),
+    0 0 0 1px rgba(15,23,42,0.08);
+}
+/* NOCHE: titanio negro cepillado */
+[data-theme="night"] .p18-knob {
+  left: 45px;   /* 84 - 36 - 3 */
+  background: linear-gradient(180deg, #33363d 0%, #1d2026 55%, #14161b 100%);
+  box-shadow:
+    0 6px 14px -2px rgba(0,0,0,0.8),
+    inset 0 -3px 5px -1px rgba(255,255,255,0.06),
+    0 -5px 10px -2px rgba(255,255,255,0.08),
+    inset 0 2px 3px -1px rgba(255,255,255,0.12),
+    inset 0 0 6px 1px rgba(0,0,0,0.55),
+    0 0 0 1px rgba(255,255,255,0.07);
+}
+
+/* Exposición de glifos según estado */
+[data-theme="day"] .p18-glyph-sun  { opacity: 1; filter: drop-shadow(0 1px 2px rgba(255,159,10,0.5)); }
+[data-theme="day"] .p18-glyph-moon { opacity: 0; }
+[data-theme="night"] .p18-glyph-moon { opacity: 1; filter: drop-shadow(0 0 5px rgba(100,210,255,0.55)); }
+[data-theme="night"] .p18-glyph-sun  { opacity: 0; }
+
+/* Presión: hundimiento físico (input:active del material original) */
+#btn-theme:active .p18-knob {
+  filter: blur(0.4px);
+  transform: scale(0.94) !important;
+  box-shadow:
+    0 3px 8px -2px rgba(15,23,42,0.4),
+    inset 0 6px 14px 1px rgba(15,23,42,0.28),
+    inset 0 0 8px 2px rgba(255,255,255,0.4),
+    0 0 0 1px rgba(15,23,42,0.10);
+}
+[data-theme="night"] #btn-theme:active .p18-knob {
+  box-shadow:
+    0 3px 8px -2px rgba(0,0,0,0.9),
+    inset 0 6px 14px 1px rgba(0,0,0,0.7),
+    inset 0 0 8px 2px rgba(255,255,255,0.06),
+    0 0 0 1px rgba(255,255,255,0.06);
+}
+/* Hover: micro-lift */
+@media (hover: hover) {
+  #btn-theme:hover .p18-knob { transform: scale(1.04); }
+  #btn-theme:hover .p18-switch { box-shadow: inset 0 2px 6px rgba(15,23,42,0.32), inset 0 -1px 0 rgba(255,255,255,0.9), 0 1px 0 rgba(255,255,255,0.85); }
+}
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .p18-knob { transition: none; }
+}
+
 /* ---------- FIN DE COPIAS (pega aquí tus favoritos de Uiverse) ---------- */

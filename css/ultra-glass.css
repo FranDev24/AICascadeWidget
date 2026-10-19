@@ -257,3 +257,43 @@ main section:not(.hidden) > div.glass-card:nth-child(4) { animation-delay: .18s;
   body::after { animation-duration: 40s; }
   .ultra-shine { display: none; }
 }
+/* ----- 15. Status bar iPhone + Tab bar inferior iOS (movil) — Paleta iPhone 18 Pro ----- */
+@media (max-width: 768px) {
+  #statusBar {
+    backdrop-filter: var(--p18-blur-day, blur(20px) saturate(180%));
+    -webkit-backdrop-filter: var(--p18-blur-day, blur(20px) saturate(180%));
+    border-bottom: 1px solid rgba(255,255,255,0.5);
+    background: var(--p18-glass-day, rgba(255,255,255,0.6));
+    color: var(--p18-title-day, #1A1D24);
+  }
+  [data-theme="night"] #statusBar {
+    backdrop-filter: var(--p18-blur-night, blur(20px) saturate(190%));
+    -webkit-backdrop-filter: var(--p18-blur-night, blur(20px) saturate(190%));
+    background: var(--p18-glass-night, rgba(10,11,13,0.7));
+    border-bottom-color: rgba(255,255,255,0.1);
+    color: var(--p18-title-night, #F5F7FA);
+  }
+  #bottomTabBar {
+    backdrop-filter: var(--p18-blur-day, blur(28px) saturate(200%));
+    -webkit-backdrop-filter: var(--p18-blur-day, blur(28px) saturate(200%));
+    border-top: 1px solid rgba(255,255,255,0.4);
+    background: var(--p18-glass-day, rgba(255,255,255,0.75));
+  }
+  [data-theme="night"] #bottomTabBar {
+    backdrop-filter: var(--p18-blur-night, blur(28px) saturate(190%));
+    -webkit-backdrop-filter: var(--p18-blur-night, blur(28px) saturate(190%));
+    background: var(--p18-glass-night, rgba(10,11,13,0.85));
+    border-top-color: rgba(255,255,255,0.1);
+  }
+  #bottomTabBar .tab-item { transition: color .2s ease; }
+  #bottomTabBar .tab-item svg { transition: transform .2s cubic-bezier(.16,1,.3,1); }
+  #bottomTabBar .tab-item:active svg { transform: scale(0.9); }
+  main { padding-bottom: 90px !important; padding-top: 14px !important; }
+  .dynamic-island { position: fixed; top: 14px; left: 50%; transform: translateX(-50%); width: 132px; z-index: 55; }
+  main > header { margin-top: 12px !important; }
+  aside#sidebar { display: none !important; }
+  .glass-card { border-radius: 24px !important; }
+  body { color: var(--p18-title-day, #1C1C1E) !important; }
+  [data-theme="night"] body { color: var(--p18-title-night, #F5F5F7) !important; }
+}
+body { font-family: -apple-system, 'SF Pro Text', 'Inter', system-ui, sans-serif !important; }
