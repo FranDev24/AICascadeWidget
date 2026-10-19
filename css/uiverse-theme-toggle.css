@@ -1,0 +1,150 @@
+/* ==========================================================================
+   AICascade — UV-06 INTERRUPTOR ESFÉRICO CRISTAL 3D (UIverse reference)
+   Completa el trabajo de lcine (HTML/JS ya montados): estilos faltantes.
+   Adaptado a: DÍA = iPhone 18 Pro PLATA · NOCHE = iPhone 18 Pro NEGRO.
+   Todo con prefijo .theme-toggle-container para evitar colisiones con
+   otras clases genéricas (.toggle/.button/.label). Estados via :checked.
+   ========================================================================== */
+
+/* ---------- Contenedor circular de 48px en el header ---------- */
+.theme-toggle-container {
+  position: relative;
+  width: 48px; height: 48px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  /* pedestal de vidrio (día: plata) */
+  background: linear-gradient(180deg, rgba(255,255,255,0.55), rgba(255,255,255,0.25));
+  border: 1px solid rgba(255,255,255,0.9);
+  box-shadow:
+    0 3px 10px rgba(160, 175, 200, 0.22),
+    inset 0 1px 0 rgba(255,255,255,0.95);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  backdrop-filter: blur(18px) saturate(180%);
+  transition: background .5s cubic-bezier(0.16,1,0.3,1),
+              border-color .5s ease, box-shadow .5s ease;
+}
+[data-theme="night"] .theme-toggle-container {
+  background: linear-gradient(180deg, rgba(28,31,38,0.85), rgba(16,18,22,0.85));
+  border-color: rgba(255,255,255,0.10);
+  box-shadow:
+    0 6px 16px rgba(0,0,0,0.5),
+    inset 0 1px 0 rgba(255,255,255,0.08);
+}
+
+/* ---------- .toggle: lienzo de 100% con input invisible encima ---------- */
+.theme-toggle-container .toggle {
+  position: absolute; inset: 0;
+  display: block;
+  border-radius: 50%;
+}
+.theme-toggle-container .toggle input[type="checkbox"] {
+  position: absolute; inset: 0; z-index: 3;
+  width: 100%; height: 100%; margin: 0; padding: 0;
+  opacity: 0; cursor: pointer;
+  -webkit-appearance: none; appearance: none;   /* no emitir la UI de checkbox nativa */
+}
+/* Focus ring iOS accesible */
+.theme-toggle-container .toggle input:focus-visible + .button::after {
+  content: ""; position: absolute; inset: -4px; border-radius: 50%;
+  border: 2.5px solid rgba(10,132,255,0.55);
+}
+
+/* ---------- .button: LA ESFERA física (material original Uverse) ---------- */
+.theme-toggle-container .toggle .button {
+  position: absolute; left: 50%; top: 50%;
+  width: 38px; height: 38px; margin-left: -19px; margin-top: -19px;
+  border-radius: 50%; display: block;
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  /* DÍA: plata pulida — la pila de sombras del material de referencia */
+  background: linear-gradient(180deg, #ffffff 0%, #f2f5f9 48%, #dde3ec 100%);
+  box-shadow:
+    0 8px 14px -3px rgba(15,23,42,0.42),
+    inset 0 -3px 4px -1px rgba(15,23,42,0.18),
+    0 -7px 11px -2px rgba(255,255,255,0.85),
+    inset 0 3px 4px -1px rgba(255,255,255,0.95),
+    inset 0 0 5px 1px rgba(255,255,255,0.9),
+    inset 0 11px 16px 0 rgba(255,255,255,0.32),
+    0 0 0 1px rgba(15,23,42,0.09);
+}
+[data-theme="night"] .theme-toggle-container .toggle .button {
+  background: linear-gradient(180deg, #3a3e46 0%, #20232a 52%, #101216 100%);
+  box-shadow:
+    0 9px 18px -3px rgba(0,0,0,0.8),
+    inset 0 -3px 5px -1px rgba(255,255,255,0.06),
+    0 -6px 11px -2px rgba(255,255,255,0.09),
+    inset 0 2px 3px -1px rgba(255,255,255,0.13),
+    inset 0 0 6px 1px rgba(0,0,0,0.6),
+    0 0 0 1px rgba(255,255,255,0.07);
+}
+
+/* Halo (equivale al .toggle:before del original, 72→46px) */
+.theme-toggle-container .toggle .button::before {
+  content: ""; position: absolute; left: 50%; top: 50%;
+  width: 52px; height: 52px; margin-left: -26px; margin-top: -26px;
+  border-radius: 50%; opacity: 0; pointer-events: none; z-index: -1;
+  transition: opacity .4s ease, background .5s ease;
+}
+[data-theme="day"] .theme-toggle-container .toggle .button::before {
+  opacity: .30;
+  background: radial-gradient(circle, rgba(255,159,10,0.55), transparent 70%);
+}
+[data-theme="night"] .theme-toggle-container .toggle .button::before {
+  opacity: .5;
+  background: radial-gradient(circle, rgba(11,132,255,0.6), rgba(100,210,255,0.25) 55%, transparent 72%);
+}
+
+/* ---------- .label: el glifo ☼ grabado (equivalente al ☼ del original) ---------- */
+.theme-toggle-container .toggle .label {
+  position: absolute; inset: 0; z-index: 2;
+  display: grid; place-items: center;
+  font-size: 19px; line-height: 1;
+  pointer-events: none;
+  transition: color .3s ease-out, transform .25s cubic-bezier(0.23,1,0.32,1),
+              text-shadow .3s ease, opacity .3s ease;
+  /* DÍA: grabado sobre metal */
+  color: #1A1D24;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.85), 0 -1px 0 rgba(0,0,0,0.06);
+}
+[data-theme="night"] .theme-toggle-container .toggle .label {
+  color: #F5F7FA;
+  text-shadow: 0 -1px 0 rgba(255,255,255,0.10), 0 1px 2px rgba(0,0,0,0.55), 0 0 10px rgba(100,210,255,0.22);
+}
+
+/* ---------- Estados del material original (adaptados) ---------- */
+/* checked = NOCHE */
+[data-theme="night"] .theme-toggle-container .toggle .button {
+  transform: scale(1.03);
+}
+/* Presión física con blur (input:active ~ .button del original) */
+.theme-toggle-container .toggle input:active ~ .button {
+  filter: blur(0.5px);
+  transform: scale(0.90) !important;
+  box-shadow:
+    0 4px 10px -3px rgba(15,23,42,0.45),
+    inset 0 6px 14px 1px rgba(15,23,42,0.25),
+    inset 0 0 9px 2px rgba(255,255,255,0.45),
+    0 0 0 1px rgba(15,23,42,0.12);
+}
+[data-theme="night"] .theme-toggle-container .toggle input:active ~ .button {
+  box-shadow:
+    0 4px 12px -3px rgba(0,0,0,0.9),
+    inset 0 6px 15px 1px rgba(0,0,0,0.7),
+    inset 0 0 10px 2px rgba(11,132,255,0.18),
+    inset 0 -7px 16px 1px rgba(255,255,255,0.05),
+    0 0 0 1px rgba(255,255,255,0.05);
+}
+/* Squash del glifo al presionar */
+.theme-toggle-container .toggle input:active ~ .label {
+  transform: scale(0.88);
+  opacity: .75;
+}
+
+/* ---------- Táctil + reduced motion ---------- */
+@media (hover: none) {
+  .theme-toggle-container .toggle input:active ~ .button { transform: scale(0.92) !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .theme-toggle-container .toggle .button,
+  .theme-toggle-container .toggle .label { transition: none; }
+  .theme-toggle-container .toggle input:active ~ .button { filter: none; }
+}

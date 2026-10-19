@@ -35,6 +35,7 @@
   <link rel="stylesheet" href="css/uiverse-packs.css?v=uvp2">
   <link rel="stylesheet" href="css/uiverse-integrate.css?v=uv1">
   <link rel="stylesheet" href="css/18pro-sphere.css?v=s1">
+  <link rel="stylesheet" href="css/uiverse-theme-toggle.css?v=tt1">
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -179,16 +180,14 @@
         </button>
         <button onclick="app.openSettings()" data-tip="Ajustes" title="Ajustes" class="hidden sm:flex items-center justify-center w-8 h-8 rounded-full bg-white/50 border border-white/50 hover:bg-white/80 transition-all duration-300">⚙️</button>
 
-        <!-- Interruptor esférico 3D de tema (Uverse físico: Plata ⇄ Titanio) -->
-        <button id="btn-theme" title="Cambiar tema Día (Plata) / Noche (Titanio)"
-          class="p18-sphere-toggle flex items-center gap-2.5 pl-1.5 pr-3 py-1.5 rounded-full transition-all duration-300">
-          <span class="p18-switch" aria-hidden="true">
-            <span class="p18-glyph p18-glyph-sun">☀️</span>
-            <span class="p18-glyph p18-glyph-moon">🌙</span>
-            <span class="p18-sphere"><span class="theme-icon">☀️</span></span>
-          </span>
-          <span id="themeLabel" class="hidden xl:inline text-xs font-semibold text-gray-600">Modo Noche</span>
-        </button>
+        <!-- UV-06 · Interruptor esférico cristal 3D (UIverse: Plata ⇄ Obsidiana) -->
+        <div class="theme-toggle-container">
+          <div class="toggle">
+            <input type="checkbox" id="themeCheckbox" onchange="toggleTheme()">
+            <span class="button"></span>
+            <span class="label" id="themeIconLabel">☀️</span>
+          </div>
+        </div>
         <div id="backendStatus" class="hidden sm:flex items-center gap-2 text-xs font-medium text-gray-500 px-3 py-1.5 rounded-full bg-white/50 border border-white/50">
           <span class="w-2 h-2 rounded-full bg-gray-400"></span><span>Backend …</span>
         </div>

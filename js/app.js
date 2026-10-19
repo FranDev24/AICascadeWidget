@@ -63,17 +63,26 @@ const app = {
     html.setAttribute('data-theme', next);
     localStorage.setItem('aicascade_theme', next);
 
+    // Estructura nueva: #themeCheckbox + #themeIconLabel
+    const checkbox = document.getElementById('themeCheckbox');
+    const iconLabel = document.getElementById('themeIconLabel');
+
+    // Estructura anterior (compatibilidad): #btn-theme + #themeLabel + .theme-icon
     const btn = document.getElementById('btn-theme');
     const label = document.getElementById('themeLabel');
-    const icon = btn.querySelector('.theme-icon');
+    const icon = btn ? btn.querySelector('.theme-icon') : null;
 
     if (next === 'night') {
-      label.textContent = 'Modo Noche';
-      icon.textContent = '🌙';
+      if (checkbox) checkbox.checked = true;
+      if (iconLabel) iconLabel.textContent = '🌙';
+      if (label) label.textContent = 'Modo Noche';
+      if (icon) icon.textContent = '🌙';
       this.showToast('Tema', 'Modo Noche activado (iPhone Negro)', 'info');
     } else {
-      label.textContent = 'Modo Día';
-      icon.textContent = '☀️';
+      if (checkbox) checkbox.checked = false;
+      if (iconLabel) iconLabel.textContent = '☀️';
+      if (label) label.textContent = 'Modo Día';
+      if (icon) icon.textContent = '☀️';
       this.showToast('Tema', 'Modo Día activado (iPhone Plata)', 'info');
     }
   },
@@ -81,16 +90,22 @@ const app = {
   // Inicializar tema guardado
   initTheme() {
     const saved = localStorage.getItem('aicascade_theme');
+    const checkbox = document.getElementById('themeCheckbox');
+    const iconLabel = document.getElementById('themeIconLabel');
     const btn = document.getElementById('btn-theme');
     const label = document.getElementById('themeLabel');
     const icon = btn ? btn.querySelector('.theme-icon') : null;
 
     if (saved === 'night') {
       document.documentElement.setAttribute('data-theme', 'night');
+      if (checkbox) checkbox.checked = true;
+      if (iconLabel) iconLabel.textContent = '🌙';
       if (label) label.textContent = 'Modo Noche';
       if (icon) icon.textContent = '🌙';
     } else {
       document.documentElement.setAttribute('data-theme', 'day');
+      if (checkbox) checkbox.checked = false;
+      if (iconLabel) iconLabel.textContent = '☀️';
       if (label) label.textContent = 'Modo Día';
       if (icon) icon.textContent = '☀️';
     }
