@@ -224,6 +224,21 @@ const app = {
     document.getElementById('switchCount').textContent = s.switchCount;
     document.getElementById('callCount').textContent = s.callCount;
 
+    // iOS: anillo de progreso + Dynamic Island (solo visual, usa mismos datos)
+    try {
+      const ring = document.getElementById('tokenRing');
+      if (ring) {
+        ring.style.setProperty('--ring-pct', pct);
+        ring.style.setProperty('--ring-fg', pct >= 90 ? '#f43f5e' : pct >= 60 ? '#f59e0b' : '#10b981');
+        const pctEl = document.getElementById('tokenPct');
+        if (pctEl) pctEl.textContent = pct + '%';
+      }
+      const island = document.getElementById('iosIslandText');
+      if (island) island.textContent = `${s.activeModel} · ${s.statusText}`;
+      const dot = document.getElementById('iosIslandDot');
+      if (dot) dot.style.background = pct >= 90 ? '#f43f5e' : pct >= 60 ? '#fbbf24' : '#34d399';
+    } catch (e) {}
+
     // Modelos por nivel
     this.renderTiers(s.models);
 

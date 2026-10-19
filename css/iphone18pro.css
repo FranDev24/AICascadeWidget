@@ -1,0 +1,222 @@
+/* ==========================================================================
+   AICascade Widget — PALETA OFICIAL iPhone 18 Pro (Filtros Día/Noche)
+   Día  = iPhone 18 Pro PLATA  (Silver Titanium / Pure Glass)
+   Noche= iPhone 18 Pro NEGRO  (Dark Titanium / Deep Obsidian)
+   Especificación exacta del requisito. Cargada de última: gana empates.
+   Solo variables + overrides visuales. Cero lógica.
+   ========================================================================== */
+
+/* =========================== FILTRO DÍA — PLATA =========================== */
+:root {
+  /* Base fria con luz ambiental */
+  --p18-day-base-a: #F2F4F8;
+  --p18-day-base-b: #E6E9F0;
+
+  /* Superficie Liquid Glass */
+  --p18-glass-day: rgba(255, 255, 255, 0.68);
+  --p18-blur-day: blur(36px) saturate(220%);
+  --p18-bezel-day: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0.2));
+  --p18-shadow-day: 0 20px 48px rgba(160, 175, 200, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+
+  /* Tipografía Plata */
+  --p18-title-day: #1A1D24;   /* Titanio Plata Pulido */
+  --p18-sub-day:   #5A6275;   /* Gris Frío Titanio */
+
+  /* Acentos iOS Líquido */
+  --p18-blue-day:  #007AFF;
+  --p18-green-day: #34C759;
+}
+
+/* ===================== FILTRO NOCHE — NEGRO TITANIUM ===================== */
+[data-theme="night"] {
+  /* Obsidiana profunda con neblina cobalto */
+  --p18-night-base-a: #0A0B0E;
+  --p18-night-base-b: #12141A;
+
+  /* Dark Liquid Glass */
+  --p18-glass-night: rgba(18, 20, 26, 0.78);
+  --p18-blur-night: blur(36px) saturate(190%);
+  --p18-bezel-night: linear-gradient(135deg, rgba(255,255,255,0.18), rgba(255,255,255,0.02));
+  --p18-shadow-night: 0 25px 50px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+
+  /* Tipografía Titanio Negro */
+  --p18-title-night: #F5F7FA;  /* Blanco Puro Titanio */
+  --p18-sub-night:   #8E95A5;  /* Gris Espacial Oscuro */
+
+  /* Acentos Neón */
+  --p18-blue-night:  #0B84FF;
+  --p18-cyan-night:  #64D2FF;
+  --p18-amber-night: #FF9F0A;
+}
+
+/* ================== APLICACIÓN B, DÍA: SUPERFICIE PLATA ================== */
+:root,
+[data-theme="day"] {
+  --ios-glass-bg: var(--p18-glass-day) !important;
+  --ios-glass-blur: var(--p18-blur-day) !important;
+  --ios-shine: var(--p18-blue-day);
+}
+
+.glass-card {
+  background: var(--p18-glass-day) !important;
+  backdrop-filter: var(--p18-blur-day) !important;
+  -webkit-backdrop-filter: var(--p18-blur-day) !important;
+  box-shadow: var(--p18-shadow-day) !important;
+}
+/* Micro-bezel especular 1px EXACTO */
+[data-theme="day"] .glass-card::before,
+:root .glass-card::before {
+  background: var(--p18-bezel-day) !important;
+}
+[data-theme="day"] .glass-card:hover {
+  box-shadow: 0 26px 56px rgba(160, 175, 200, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
+}
+
+/* Wallpaper Día: gradiente frío + partículas de luz ambiental */
+#iosWallpaper {
+  background:
+    radial-gradient(160px 160px at 18% 22%, rgba(255,255,255,0.9), transparent 68%),
+    radial-gradient(110px 110px at 74% 58%, rgba(255,255,255,0.72), transparent 70%),
+    radial-gradient(90px 90px at 42% 78%, rgba(214,226,244,0.85), transparent 72%),
+    radial-gradient(140px 140px at 88% 14%, rgba(224,233,246,0.8), transparent 70%),
+    linear-gradient(168deg, var(--p18-day-base-a) 0%, var(--p18-day-base-b) 100%) !important;
+}
+/* Aurora en tonos plata fría */
+:root #aurora .blob-1 { background: radial-gradient(circle at 35% 35%, rgba(0,122,255,0.20), transparent 62%); }
+:root #aurora .blob-2 { background: radial-gradient(circle at 60% 40%, rgba(94,92,230,0.16), transparent 64%); }
+:root #aurora .blob-3 { background: radial-gradient(circle at 50% 50%, rgba(52,199,89,0.12), transparent 60%); }
+
+/* Tipografía Día */
+[data-theme="day"] {
+  --ios-txt-1: #1A1D24;
+  --ios-txt-2: #5A6275;
+  --ios-txt-3: #8A94A6 !important;
+  --ios-accent: #007AFF !important;
+  --ios-accent-alt: #5E5CE6 !important;
+  --ios-green: #34C759 !important;
+  --ios-amber: #FF9F0A !important;
+  --ios-track: rgba(90, 98, 117, 0.10) !important;
+}
+[data-theme="day"] h1, [data-theme="day"] h2, [data-theme="day"] h3 {
+  color: #1A1D24 !important;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.55), 0 8px 24px rgba(160,175,200,0.18);
+}
+/* Destello metálico del título plata (sustituye gradiente líquido) */
+[data-theme="day"] .liquid-text {
+  background: linear-gradient(100deg,
+    #1A1D24 10%, #566079 30%, #9AA3B5 46%, #1A1D24 60%, #566079 84%, #1A1D24 98%);
+  filter: drop-shadow(0 1px 0 rgba(255,255,255,0.5)) drop-shadow(0 6px 18px rgba(160,175,200,0.22));
+}
+/* Volumen 3D en métricas/contadores */
+[data-theme="day"] .ios-num, [data-theme="day"] #metricLatency,
+[data-theme="day"] #metricErrors, [data-theme="day"] #metricIO,
+[data-theme="day"] #totalTokens, [data-theme="day"] #remainingTokens {
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.10) !important;
+}
+
+/* ====================== APLICACIÓN B, NOCHE: OBSIDIANA ===================== */
+[data-theme="night"] {
+  --ios-glass-bg: var(--p18-glass-night) !important;
+  --ios-glass-blur: var(--p18-blur-night) !important;
+
+  --ios-txt-1: #F5F7FA !important;
+  --ios-txt-2: #8E95A5 !important;
+  --ios-txt-3: #8E95A5 !important;
+  --ios-accent: #0B84FF !important;
+  --ios-accent-alt: #7d7aff !important;
+  --ios-green: #30d158 !important;
+  --ios-amber: #FF9F0A !important;
+  --ios-track: rgba(255, 255, 255, 0.07) !important;
+}
+[data-theme="night"] .glass-card {
+  background: var(--p18-glass-night) !important;
+  backdrop-filter: var(--p18-blur-night) !important;
+  -webkit-backdrop-filter: var(--p18-blur-night) !important;
+  box-shadow: var(--p18-shadow-night) !important;
+}
+[data-theme="night"] .glass-card::before {
+  background: var(--p18-bezel-night) !important;
+}
+[data-theme="night"] .glass-card:hover {
+  box-shadow: 0 30px 62px rgba(0, 0, 0, 0.70), inset 0 1px 0 rgba(255, 255, 255, 0.14) !important;
+}
+
+/* Wallpaper Noche: obsidiana + neblina cobalto ultra-sutil */
+[data-theme="night"] #iosWallpaper {
+  background:
+    radial-gradient(1100px 720px at 8% -8%, rgba(11, 132, 255, 0.10), transparent 60%),
+    radial-gradient(900px 640px at 90% 8%, rgba(100, 210, 255, 0.055), transparent 62%),
+    radial-gradient(800px 600px at 60% 106%, rgba(11, 132, 255, 0.07), transparent 64%),
+    linear-gradient(172deg, var(--p18-night-base-a) 0%, var(--p18-night-base-b) 100%) !important;
+}
+/* Aurora nocturna: cobalto + cian, sin verde */
+[data-theme="night"] #aurora { opacity: .34; }
+[data-theme="night"] #aurora .blob-1 { background: radial-gradient(circle at 35% 35%, rgba(11,132,255,0.30), transparent 62%); }
+[data-theme="night"] #aurora .blob-2 { background: radial-gradient(circle at 60% 40%, rgba(100,210,255,0.16), transparent 64%); }
+[data-theme="night"] #aurora .blob-3 { background: radial-gradient(circle at 50% 50%, rgba(125,122,255,0.14), transparent 60%); }
+
+/* Tipografía Noche: blanco titanio + destello difuso */
+[data-theme="night"] h1, [data-theme="night"] h2, [data-theme="night"] h3 {
+  color: #F5F7FA !important;
+  text-shadow: 0 2px 12px rgba(255, 255, 255, 0.08) !important;
+}
+[data-theme="night"] .liquid-text {
+  background: linear-gradient(100deg,
+    #F5F7FA 10%, #B9C4D6 30%, #64D2FF 46%, #F5F7FA 60%, #B9C4D6 84%, #F5F7FA 98%);
+  filter: drop-shadow(0 0 20px rgba(100,210,255,0.20));
+}
+[data-theme="night"] .ios-num, [data-theme="night"] #metricLatency,
+[data-theme="night"] #metricErrors, [data-theme="night"] #metricIO,
+[data-theme="night"] #totalTokens, [data-theme="night"] #remainingTokens {
+  text-shadow: 0 2px 12px rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Acento nocturno everywhere */
+[data-theme="night"] .ios-btn-primary {
+  background: linear-gradient(180deg, #0B84FF, #0869d8) !important;
+  box-shadow: 0 6px 18px rgba(11, 132, 255, 0.38), inset 0 1px 0 rgba(255,255,255,0.30) !important;
+}
+[data-theme="night"] .ios-ring[data-tone="ok"]  { --ring-color: #30d158; }
+[data-theme="night"] .ios-ring[data-tone="warn"]{ --ring-color: #FF9F0A; }
+[data-theme="night"] .ios-ring[data-tone="crit"]{ --ring-color: #ff453a; }
+:root .ios-ring[data-tone="ok"]   { --ring-color: #34C759; }
+:root .ios-ring[data-tone="warn"] { --ring-color: #FF9F0A; }
+:root .ios-ring[data-tone="crit"] { --ring-color: #FF3B30; }
+
+/* ================== TRANSICIÓN TEMA 60/120fps (spring) ================= */
+body {
+  transition: background-color .5s cubic-bezier(0.16, 1, 0.3, 1),
+              color .5s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+.glass-card, #iosWallpaper, aside#sidebar, main > header, .dynamic-island {
+  transition: background .5s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+.glass-card { transition-property: background, backdrop-filter, box-shadow, transform, border-radius !important; transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1) !important; }
+
+/* Iconos: tiles rounded-2xl con escala magnética EXACTA */
+.ios-tile { border-radius: 16px !important; }
+@media (hover: hover) {
+  .ios-tile:hover { transform: scale(1.05) !important; }
+}
+
+/* Rail + toolbar toman la paleta exacta en ambos filtros */
+@media (min-width: 769px) {
+  aside#sidebar {
+    background: var(--p18-glass-day) !important;
+    backdrop-filter: var(--p18-blur-day) !important;
+    -webkit-backdrop-filter: var(--p18-blur-day) !important;
+  }
+  [data-theme="night"] aside#sidebar {
+    background: var(--p18-glass-night) !important;
+    backdrop-filter: var(--p18-blur-night) !important;
+    -webkit-backdrop-filter: var(--p18-blur-night) !important;
+  }
+}
+main > header {
+  background: var(--p18-glass-day) !important;
+}
+[data-theme="night"] main > header { background: var(--p18-glass-night) !important; }
+
+/* Refracción SVG usa blur exacto de cada filtro */
+.fx-refract .glass-card { backdrop-filter: url(#glassDistort) blur(36px) saturate(220%) !important; }
+[data-theme="night"].fx-refract .glass-card { backdrop-filter: url(#glassDistort) blur(36px) saturate(190%) !important; }

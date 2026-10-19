@@ -1,0 +1,274 @@
+/* ==========================================================================
+   AICascade Widget — HYPER-LIQUID GLASS FX (capa v2 sobre ios.css)
+   Patrones de: CodePen "iOS Liquid Glass Real Refraction" (SVG displacement),
+   instancho/liquid-glass-ui (conic border shine), Frutiger Aero (aurora).
+   Solo visuales: no toca IDs, ni JS, ni lógica.
+   ========================================================================== */
+
+/* ---------- Registro de propiedades animables (60fps) ---------- */
+@property --pct { syntax: '<number>'; inherits: true; initial-value: 0; }
+@property --shine-angle { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+@property --mx { syntax: '<percentage>'; inherits: false; initial-value: 50%; }
+@property --my { syntax: '<percentage>'; inherits: false; initial-value: 50%; }
+
+/* ---------- R30. Aurora de fondo (blobs en drift, refraction fodder) ---------- */
+#aurora {
+  position: fixed; inset: -20%; z-index: 1; pointer-events: none;
+  filter: blur(60px); opacity: .55;
+  transition: opacity .8s ease;
+}
+#aurora .blob { position: absolute; border-radius: 50%; will-change: transform; }
+#aurora .blob-1 {
+  width: 46vw; height: 46vw; left: 6%; top: 4%;
+  background: radial-gradient(circle at 35% 35%, rgba(10,132,255,0.34), transparent 62%);
+  animation: drift1 22s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+}
+#aurora .blob-2 {
+  width: 38vw; height: 38vw; right: 4%; top: 22%;
+  background: radial-gradient(circle at 60% 40%, rgba(94,92,230,0.30), transparent 64%);
+  animation: drift2 26s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+}
+#aurora .blob-3 {
+  width: 34vw; height: 34vw; left: 34%; bottom: -8%;
+  background: radial-gradient(circle at 50% 50%, rgba(48,209,88,0.16), transparent 60%);
+  animation: drift3 30s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+}
+@keyframes drift1 { to { transform: translate(9vw, 7vh) scale(1.14); } }
+@keyframes drift2 { to { transform: translate(-8vw, 5vh) scale(1.10); } }
+@keyframes drift3 { to { transform: translate(6vw, -6vh) scale(0.92); } }
+
+[data-theme="night"] #aurora { opacity: .42; }
+[data-theme="night"] #aurora .blob-1 { background: radial-gradient(circle at 35% 35%, rgba(10,132,255,0.32), transparent 62%); }
+[data-theme="night"] #aurora .blob-2 { background: radial-gradient(circle at 60% 40%, rgba(125,122,255,0.30), transparent 64%); }
+[data-theme="night"] #aurora .blob-3 { background: radial-gradient(circle at 50% 50%, rgba(14,165,233,0.20), transparent 60%); }
+
+/* ---------- R60. Refracción real (SVG displacement) — Chromium/Safari ---------- */
+/* Activada por JS solo si el motor soporta backdrop-filter: url(#id) */
+.fx-refract .glass-card {
+  backdrop-filter: url(#glassDistort) blur(26px) saturate(200%) !important;
+}
+/* Mantener el blur base en navegadores sin url() (fallback ya en ios.css) */
+@supports not (backdrop-filter: url(#glassDistort) blur(1px)) {
+  .fx-refract .glass-card { backdrop-filter: var(--ios-glass-blur) !important; }
+}
+
+/* ---------- R70. Superficie líquida: micro-bezel 1px + inner glow ---------- */
+.glass-card::before {
+  content: ""; position: absolute; inset: 0; z-index: 3;
+  border-radius: inherit; padding: 1px;
+  background: linear-gradient(135deg,
+    rgba(255,255,255,0.60), rgba(255,255,255,0.22) 30%,
+    rgba(255,255,255,0.05) 55%, rgba(255,255,255,0.38) 82%, rgba(255,255,255,0.62));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: destination-out;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+}
+[data-theme="night"] .glass-card::before {
+  background: linear-gradient(135deg,
+    rgba(255,255,255,0.22), rgba(255,255,255,0.05) 30%,
+    rgba(255,255,255,0.02) 55%, rgba(255,255,255,0.10) 82%, rgba(255,255,255,0.26));
+}
+
+/* Volumetría flotante de alta gama */
+.glass-card {
+  box-shadow:
+    0 2px 4px rgba(15,23,42,0.03),
+    0 12px 28px rgba(15,23,42,0.07),
+    0 30px 60px rgba(15,23,42,0.12),
+    inset 0 1px 0 rgba(255,255,255,0.85),
+    inset 0 -1px 0 rgba(15,23,42,0.04) !important;
+}
+[data-theme="night"] .glass-card {
+  box-shadow:
+    0 2px 6px rgba(0,0,0,0.45),
+    0 16px 36px rgba(0,0,0,0.46),
+    0 38px 80px rgba(0,0,0,0.52),
+    inset 0 1px 0 rgba(255,255,255,0.12),
+    inset 0 -1px 0 rgba(0,0,0,0.35) !important;
+}
+.glass-card:hover {
+  box-shadow:
+    0 4px 8px rgba(15,23,42,0.05),
+    0 18px 38px rgba(15,23,42,0.10),
+    0 42px 84px rgba(15,23,42,0.16),
+    inset 0 1px 0 rgba(255,255,255,0.9) !important;
+}
+
+/* ---------- R90. Conic border-shine + glow radial que sigue el cursor ---------- */
+.lg-shine {
+  position: absolute; inset: 0; z-index: 2;
+  border-radius: inherit; pointer-events: none;
+  background:
+    /* halo interior en el cursor */
+    radial-gradient(320px 220px at var(--mx) var(--my),
+      rgba(255,255,255,0.14), rgba(255,255,255,0.04) 42%, transparent 68%),
+    /* borde cónico orientado al cursor */
+    conic-gradient(from var(--shine-angle) at 50% 50%,
+      rgba(255,255,255,0.45) 0deg,
+      rgba(255,255,255,0.06) 28deg,
+      transparent 70deg, transparent 290deg,
+      rgba(255,255,255,0.28) 340deg,
+      rgba(255,255,255,0.45) 360deg);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: destination-out;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  border: 2px solid transparent;
+  opacity: 0; transition: opacity .45s ease;
+}
+.glass-card:hover .lg-shine { opacity: 1; }
+[data-theme="night"] .lg-shine {
+  background:
+    radial-gradient(320px 220px at var(--mx) var(--my),
+      rgba(255,255,255,0.09), rgba(255,255,255,0.02) 42%, transparent 68%),
+    conic-gradient(from var(--shine-angle) at 50% 50%,
+      rgba(255,255,255,0.30) 0deg,
+      rgba(255,255,255,0.04) 28deg,
+      transparent 70deg, transparent 290deg,
+      rgba(255,255,255,0.20) 340deg,
+      rgba(255,255,255,0.30) 360deg);
+}
+
+/* ---------- R95. Tilt magnético con física spring ---------- */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .glass-card {
+    transform: perspective(1400px)
+      rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg))
+      scale(var(--sc, 1)) translateY(var(--ty, 0px));
+    transition: transform .55s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow .35s ease;
+    will-change: transform;
+  }
+  .glass-card:hover { --ty: -2px; }
+}
+
+/* ---------- R120. Tipografía con luz (gradient text metálico) ---------- */
+.liquid-text {
+  background: linear-gradient(100deg,
+    #0f172a 12%, #1e40af 30%, #0a84ff 44%, #0f172a 58%, #1e40af 78%, #0f172a 96%);
+  background-size: 220% 100%;
+  -webkit-background-clip: text; background-clip: text;
+  color: transparent !important;
+  animation: liquidText 7s ease-in-out infinite alternate;
+  filter: drop-shadow(0 1px 0 rgba(255,255,255,0.4)) drop-shadow(0 6px 18px rgba(10,132,255,0.20));
+}
+@keyframes liquidText { from { background-position: 0% 50%; } to { background-position: 100% 50%; } }
+[data-theme="night"] .liquid-text {
+  background: linear-gradient(100deg,
+    #f5f5f7 12%, #7dd3fc 30%, #38bdf8 44%, #f5f5f7 58%, #818cf8 78%, #f5f5f7 96%);
+  background-size: 220% 100%;
+  -webkit-background-clip: text; background-clip: text;
+  filter: drop-shadow(0 1px 0 rgba(255,255,255,0.08)) drop-shadow(0 0 22px rgba(56,189,248,0.28));
+}
+
+/* ---------- R140. Tiles de iconos con micro-brillo ---------- */
+.ios-tile {
+  position: relative; overflow: hidden;
+  transition: transform .35s cubic-bezier(0.16,1,0.3,1), box-shadow .35s, filter .35s;
+}
+.ios-tile::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit;
+  background: linear-gradient(160deg, rgba(255,255,255,0.42), transparent 42%);
+  opacity: .6; pointer-events: none;
+}
+.ios-tile:hover {
+  transform: translateY(-2px) scale(1.06);
+  filter: saturate(1.35) brightness(1.06);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.7), 0 8px 18px rgba(15,23,42,0.16);
+}
+
+/* ---------- R160. iOS Switch (visual global para checkboxes) ---------- */
+input[type="checkbox"] {
+  -webkit-appearance: none; appearance: none;
+  width: 46px; height: 27px; min-height: 27px !important;
+  border-radius: 9999px; cursor: pointer; position: relative;
+  background: rgba(15,23,42,0.14);
+  box-shadow: inset 0 1px 3px rgba(15,23,42,0.22), inset 0 0 0 1px rgba(15,23,42,0.05);
+  transition: background .3s cubic-bezier(0.16,1,0.3,1), box-shadow .3s;
+  -webkit-tap-highlight-color: transparent;
+}
+input[type="checkbox"]::after {
+  content: ""; position: absolute; top: 2px; left: 2px;
+  width: 23px; height: 23px; border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.28), 0 0 1px rgba(0,0,0,0.15);
+  transition: transform .32s cubic-bezier(0.16, 1, 0.3, 1);
+}
+input[type="checkbox"]:checked {
+  background: #30d158;
+  box-shadow: inset 0 1px 3px rgba(48,209,88,0.4), 0 0 0 1px rgba(48,209,88,0.25), 0 4px 14px rgba(48,209,88,0.35);
+}
+input[type="checkbox"]:checked::after { transform: translateX(19px); }
+input[type="checkbox"]:active::after { width: 27px; } /* squash iOS */
+input[type="checkbox"]:checked:active::after { transform: translateX(15px); }
+[data-theme="night"] input[type="checkbox"] { background: rgba(255,255,255,0.14); }
+
+/* ---------- R180. Tooltips flotantes de vidrio ---------- */
+[data-tip] { position: relative; }
+[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute; bottom: calc(100% + 10px); left: 50%;
+  transform: translate(-50%, 6px) scale(0.94);
+  background: rgba(15,23,42,0.82);
+  color: #f5f5f7; font-size: 11px; font-weight: 600; letter-spacing: 0.01em;
+  padding: 7px 12px; border-radius: 9999px; white-space: nowrap;
+  border: 1px solid rgba(255,255,255,0.16);
+  box-shadow: 0 10px 28px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.14);
+  backdrop-filter: blur(18px) saturate(160%);
+  opacity: 0; pointer-events: none; z-index: 60;
+  transition: opacity .28s ease, transform .28s cubic-bezier(0.16,1,0.3,1);
+}
+[data-tip]:hover::after { opacity: 1; transform: translate(-50%, 0) scale(1); }
+[data-tip]::before {
+  content: ""; position: absolute; bottom: calc(100% + 5px); left: 50%;
+  transform: translateX(-50%) rotate(45deg) scale(0.8);
+  width: 8px; height: 8px; background: rgba(15,23,42,0.82);
+  opacity: 0; pointer-events: none; z-index: 59;
+  transition: opacity .28s ease;
+  border-radius: 2px;
+}
+[data-tip]:hover::before { opacity: 1; }
+
+/* ---------- R200. Pulso lumínico al conmutar de modelo ---------- */
+@keyframes fxSwitchPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(10,132,255,0.42), var(--ios-shadow-rest); }
+  55%  { box-shadow: 0 0 0 14px rgba(10,132,255,0.10), var(--ios-shadow-rest); }
+  100% { box-shadow: 0 0 0 0 rgba(10,132,255,0.0), var(--ios-shadow-rest); }
+}
+.fx-pulse { animation: fxSwitchPulse .9s cubic-bezier(0.16,1,0.3,1) 1; }
+@keyframes ringSwitchPulse {
+  0%   { filter: drop-shadow(0 6px 16px rgba(10,132,255,0.18)); }
+  45%  { filter: drop-shadow(0 6px 26px rgba(10,132,255,0.55)) saturate(1.3); }
+  100% { filter: drop-shadow(0 6px 16px rgba(10,132,255,0.18)); }
+}
+.fx-ring-pulse { animation: ringSwitchPulse 1s cubic-bezier(0.16,1,0.3,1) 1; }
+
+/* ---------- R220. Terminal: brillo de consola translúcida ---------- */
+#panel-terminal .glass-card::after {
+  content: ""; display: block !important;
+  position: absolute; top: -40%; left: 10%; width: 80%; height: 55%;
+  background: radial-gradient(closest-side, rgba(48,209,88,0.07), transparent 70%);
+  pointer-events: none; opacity: 1;
+  animation: termGlow 6s ease-in-out infinite alternate;
+}
+@keyframes termGlow { from { transform: translateX(-4%); opacity: .7; } to { transform: translateX(4%); opacity: 1; } }
+
+/* ---------- R240. Feedback táctil iPhone 16 Pro (ProMotion) ---------- */
+@media (hover: none) {
+  .glass-card { transform: none !important; }
+  .glass-card:active { transform: scale(0.985) !important; transition: transform .12s ease; }
+  .ios-btn:active { transform: scale(0.94); filter: brightness(1.1); }
+  .lg-shine { display: none; }
+  #aurora { opacity: .5; }
+}
+
+/* ---------- R260. Rendimiento / accesibilidad ---------- */
+@media (prefers-reduced-motion: reduce) {
+  #aurora .blob, .liquid-text, .fx-pulse, .fx-ring-pulse,
+  .ios-progress > div::after, #panel-terminal .glass-card::after {
+    animation: none !important;
+  }
+  .glass-card { transform: none !important; transition: box-shadow .3s; }
+}

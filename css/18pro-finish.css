@@ -1,0 +1,164 @@
+/* ==========================================================================
+   AICascade Widget — 18 PRO FINISH (capa FINAL de pulido)
+   Corrige: textos "marcador" feos, anillo disco azul, chips flotantes,
+   tinte azul nocturno, island colisionada. Tipografía estilo SF Pro real.
+   Se carga de última: gana todos los empates. Cero lógica.
+   ========================================================================== */
+
+/* ---------- F1. Tipografía LIMPIA estilo SF Pro (sin gradientes) ---------- */
+h1, h2, h3, #panelTitle, #activeModel, #statusText {
+  background: none !important;
+  -webkit-background-clip: initial !important;
+  background-clip: initial !important;
+  color: var(--ios-txt-1, #1A1D24) !important;
+  animation: none !important;
+  filter: none !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+h1, #panelTitle {
+  color: #1A1D24 !important;
+  letter-spacing: -0.045em !important;
+  font-weight: 750 !important;
+}
+#activeModel {
+  letter-spacing: -0.05em !important;
+  font-weight: 780 !important;
+  line-height: 1.08 !important;
+}
+[data-theme="night"] #panelTitle,
+[data-theme="night"] #activeModel {
+  color: #F5F7FA !important;
+}
+/* Sombra de contención mínima (volumen sin gratos "glows") */
+[data-theme="day"] h1, [data-theme="day"] #activeModel {
+  text-shadow: 0 1px 1px rgba(255,255,255,0.6) !important;
+}
+[data-theme="night"] h1, [data-theme="night"] #activeModel {
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5) !important;
+}
+/* Numerales: netos, tabulares, sin text-shadow ruidoso */
+.ios-num { text-shadow: none !important; }
+[data-theme="day"] .ios-num  { color: currentColor; }
+#iosRingVal { letter-spacing: -0.03em; font-weight: 800; }
+
+/* ---------- F2. Gauge circular SVG (arco real, nunca disco) ---------- */
+#iosRing { width: 132px; height: 132px; position: relative; display: grid; place-items: center; }
+#iosRing svg.ios-ring-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+#iosRing .ring-track {
+  stroke: rgba(255,255,255,0.10);
+  stroke-width: 11; stroke-linecap: round;
+}
+[data-theme="day"] #iosRing .ring-track { stroke: rgba(15,23,42,0.07); }
+#iosRing .ring-prog {
+  fill: none; stroke: var(--ring-ok, #34C759);
+  stroke-width: 11; stroke-linecap: round;
+  stroke-dasharray: 351.86px;       /* 2π·56 */
+  stroke-dashoffset: calc(var(--pct, 0) * -3.5186px); /* 0..100% */
+  transition: stroke-dashoffset .65s cubic-bezier(0.16, 1, 0.3, 1), stroke .4s ease;
+  filter: none !important;
+}
+#iosRing[data-tone="ok"]   .ring-prog { stroke: #34C759; }
+#iosRing[data-tone="warn"] .ring-prog { stroke: #FF9F0A; }
+#iosRing[data-tone="crit"] .ring-prog { stroke: #FF3B30; }
+[data-theme="night"] #iosRing[data-tone="ok"]   .ring-prog { stroke: #30d158; }
+[data-theme="night"] #iosRing[data-tone="warn"] .ring-prog { stroke: #FF9F0A; }
+[data-theme="night"] #iosRing[data-tone="crit"] .ring-prog { stroke: #ff453a; }
+#iosRing .ios-ring-inner {
+  position: relative; z-index: 2;
+  width: 96px; height: 96px; border-radius: 50%;
+  display: grid; place-items: center; text-align: center;
+  background: transparent;
+}
+#iosRing .ios-ring-inner b { font-size: 1.3rem; }
+#iosRing .ios-ring-inner span {
+  font-size: 0.55rem; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--ios-txt-3) !important; margin-top: 3px;
+}
+/* matar cualquier residuo del anillo conic anterior */
+.ios-ring::before, .ios-ring > .ios-ring-inner::before { background: none !important; }
+
+/* ---------- F3. Chips: píldora translúcida correcta por tema ---------- */
+.ios-chip {
+  background: rgba(255,255,255,0.62) !important;
+  border: 1px solid rgba(255,255,255,0.9) !important;
+  color: #5A6275 !important;
+  box-shadow: 0 1px 2px rgba(160,175,200,0.14), inset 0 1px 0 rgba(255,255,255,0.85) !important;
+  backdrop-filter: blur(16px) saturate(180%);
+}
+.ios-chip b { color: #1A1D24 !important; }
+[data-theme="night"] .ios-chip {
+  background: rgba(255,255,255,0.06) !important;
+  border: 1px solid rgba(255,255,255,0.09) !important;
+  color: #8E95A5 !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06) !important;
+}
+[data-theme="night"] .ios-chip b { color: #F5F7FA !important; }
+
+/* ---------- F4. Noche: obsidiana NEUTRA (adiós tinte azul) ---------- */
+[data-theme="night"] #aurora { opacity: .17 !important; }
+[data-theme="night"] #aurora .blob-1 { background: radial-gradient(circle at 35% 35%, rgba(11,132,255,0.22), transparent 62%); }
+[data-theme="night"] #aurora .blob-2 { background: radial-gradient(circle at 60% 40%, rgba(100,210,255,0.10), transparent 64%); }
+[data-theme="night"] #aurora .blob-3 { background: radial-gradient(circle at 50% 50%, rgba(125,122,255,0.09), transparent 60%); }
+[data-theme="night"] .glass-card {
+  background: rgba(18, 20, 26, 0.80) !important;
+}
+/* Rail muy denso al noche: sólido titanio */
+@media (min-width: 769px) {
+  [data-theme="night"] aside#sidebar { background: rgba(12, 14, 18, 0.92) !important; }
+  [data-theme="night"] main > header { background: rgba(13, 15, 20, 0.86) !important; }
+}
+
+/* ---------- F5. Nav rail: píldora activa neutra + icono acento ---------- */
+@media (min-width: 769px) {
+  .nav-item { background: transparent !important; box-shadow: none !important; border: none !important; }
+  .nav-item.bg-blue-50\/50 {
+    background: rgba(255,255,255,0.92) !important;
+    box-shadow: 0 1px 2px rgba(15,23,42,0.07), 0 8px 20px rgba(15,23,42,0.09), inset 0 1px 0 #fff !important;
+  }
+  [data-theme="night"] .nav-item.bg-blue-50\/50 {
+    background: rgba(255,255,255,0.13) !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.15) !important;
+  }
+  .nav-item.bg-blue-50\/50 svg { color: #007AFF !important; }
+  [data-theme="night"] .nav-item.bg-blue-50\/50 svg { color: #0B84FF !important; }
+}
+
+/* ---------- F6. Dynamic Island: hierarquía y aire ---------- */
+.dynamic-island { gap: 8px !important; padding: 8px 18px !important; }
+.dynamic-island .di-label { color: rgba(255,255,255,0.38) !important; font-weight: 700; }
+.dynamic-island .di-time  { color: rgba(255,255,255,0.92) !important; font-variant-numeric: tabular-nums; }
+.dynamic-island .di-sep {
+  width: 1px; height: 14px; background: rgba(255,255,255,0.14);
+  border-radius: 1px; margin: 0 2px;
+}
+.dynamic-island .di-dot { width: 7px !important; height: 7px !important; }
+
+/* ---------- F7. Métricas internas: filas planas iOS ---------- */
+#panel-dashboard .space-y-2\.5 > div {
+  background: rgba(255,255,255,0.5) !important;
+  border: 1px solid rgba(255,255,255,0.8) !important;
+  border-radius: 12px !important;
+}
+[data-theme="night"] #panel-dashboard .space-y-2\.5 > div {
+  background: rgba(255,255,255,0.05) !important;
+  border-color: rgba(255,255,255,0.07) !important;
+}
+
+/* ---------- F8. Barras de progreso: tinta de acento exacta ---------- */
+#tokenBarTotal.bg-blue-500, [data-theme="day"] #tokenBarTotal.bg-blue-500 { background: #007AFF !important; }
+[data-theme="night"] #tokenBarTotal.bg-blue-500 { background: #0B84FF !important; }
+#tokenBarRemaining.bg-green-500, [data-theme="day"] #tokenBarRemaining.bg-green-500 { background: #34C759 !important; }
+[data-theme="night"] #tokenBarRemaining.bg-green-500 { background: #30d158 !important; }
+
+/* ---------- F9. Anti-"marcador": neutralizar text-grad global de otras capas ---------- */
+#panelTitle, #activeModel, h1, h2, h3 {
+  background-image: none !important;
+}
+
+/* ---------- F10. Pulido micro: hairlines y sombras sobrias ---------- */
+.model-item::after { border-color: rgba(138,148,166,0.55) !important; }
+.glass-card {
+  transition:
+    background .5s cubic-bezier(0.16,1,0.3,1),
+    box-shadow .35s ease !important;
+}

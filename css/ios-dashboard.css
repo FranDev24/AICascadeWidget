@@ -1,0 +1,168 @@
+/* ==========================================================================
+   AICascade Widget — iOS 18 Pro Dashboard Skin (capa visual, no toca logica)
+   Widgets rounded-3xl, Liquid Glass 32px, toggles iOS, anillos de progreso,
+   Dynamic Island, tipografia SF-feel. Respeta todos los IDs existentes.
+   ========================================================================== */
+
+/* --- Fondo ambiente iOS --- */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(600px 320px at 12% -4%, rgba(96,165,250,.16), transparent 60%),
+    radial-gradient(700px 360px at 88% 6%, rgba(167,139,250,.15), transparent 60%),
+    radial-gradient(900px 500px at 50% 110%, rgba(56,189,248,.10), transparent 60%);
+}
+[data-theme="night"] body::before {
+  background:
+    radial-gradient(600px 320px at 12% -4%, rgba(56,189,248,.10), transparent 60%),
+    radial-gradient(700px 360px at 88% 6%, rgba(167,139,250,.10), transparent 60%),
+    radial-gradient(900px 500px at 50% 110%, rgba(99,102,241,.12), transparent 60%);
+}
+main { position: relative; z-index: 10; }
+
+/* --- Widgets iOS: glass 32px + rounded-3xl + sombras multinivel --- */
+.glass-card {
+  border-radius: 1.75rem !important;
+  background: rgba(255,255,255,.72) !important;
+  backdrop-filter: blur(32px) saturate(210%) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(210%) !important;
+  border: 1px solid rgba(255,255,255,.8) !important;
+  box-shadow: 0 12px 32px rgba(0,0,0,.06), 0 2px 6px rgba(0,0,0,.04), inset 0 1px 0 rgba(255,255,255,.7) !important;
+  transition: transform .3s cubic-bezier(.25,.8,.25,1), box-shadow .3s cubic-bezier(.25,.8,.25,1) !important;
+}
+[data-theme="night"] .glass-card {
+  background: rgba(18,20,26,.80) !important;
+  backdrop-filter: blur(32px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(180%) !important;
+  border: 1px solid rgba(255,255,255,.10) !important;
+  box-shadow: 0 16px 40px rgba(0,0,0,.45), 0 2px 8px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.08) !important;
+}
+section .glass-card:hover {
+  transform: translateY(-2px);
+}
+section .glass-card:hover {
+  box-shadow: 0 18px 44px rgba(0,0,0,.09), 0 2px 6px rgba(0,0,0,.05), inset 0 1px 0 rgba(255,255,255,.7) !important;
+}
+
+/* --- Tipografia iOS: titulares SF-feel, numeros mono --- */
+h1, h2, h3, #panelTitle, #activeModel {
+  letter-spacing: -0.022em !important;
+  font-feature-settings: "cv11", "ss01";
+}
+#currentTime, #switchCount, #callCount, #tokenUsed, #tokenPct,
+#metricLatency, #metricErrors, #metricIO, .font-mono {
+  font-variant-numeric: tabular-nums lining-nums !important;
+}
+
+/* --- Dynamic Island: capsula reloj/estado --- */
+.ios-island {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .45rem .9rem;
+  border-radius: 999px;
+  background: rgba(10,10,15,.92);
+  color: #f4f4f5;
+  box-shadow: 0 8px 24px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.12);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  font-size: 12px;
+  font-weight: 600;
+}
+.ios-island .ios-island-dot {
+  width: 8px; height: 8px; border-radius: 999px;
+  background: #34d399;
+  box-shadow: 0 0 10px #34d399;
+  animation: ios-island-pulse 2s ease-in-out infinite;
+}
+@keyframes ios-island-pulse {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50% { opacity: .55; transform: scale(.8); }
+}
+
+/* --- Anillo de progreso circular (tokens) --- */
+.ios-ring {
+  --ring-size: 148px;
+  --ring-track: rgba(0,0,0,.08);
+  --ring-fg: #10b981;
+  position: relative;
+  width: var(--ring-size);
+  height: var(--ring-size);
+  border-radius: 999px;
+  background: conic-gradient(var(--ring-fg) calc(var(--ring-pct,0)*1%), var(--ring-track) 0);
+  display: grid;
+  place-items: center;
+  transition: --ring-pct .6s ease;
+}
+[data-theme="night"] .ios-ring { --ring-track: rgba(255,255,255,.10); }
+.ios-ring::before {
+  content: "";
+  position: absolute;
+  inset: 12px;
+  border-radius: 999px;
+  background: var(--bg-secondary);
+  box-shadow: inset 0 2px 8px rgba(0,0,0,.06);
+}
+.ios-ring > * { position: relative; z-index: 1; }
+
+/* --- Switch estilo iOS --- */
+.ios-switch {
+  position: relative;
+  width: 51px; height: 31px;
+  border-radius: 999px;
+  background: rgba(120,120,128,.32);
+  border: none;
+  cursor: pointer;
+  transition: background .3s cubic-bezier(.25,.8,.25,1);
+  flex-shrink: 0;
+}
+.ios-switch::after {
+  content: "";
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 27px; height: 27px;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 3px 8px rgba(0,0,0,.2), 0 1px 2px rgba(0,0,0,.15);
+  transition: transform .3s cubic-bezier(.25,.8,.25,1);
+}
+.ios-switch[aria-checked="true"], .ios-switch.on { background: #34c759; }
+.ios-switch[aria-checked="true"]::after, .ios-switch.on::after { transform: translateX(20px); }
+
+/* --- Iconos acolchados iOS (w-10 rounded-2xl) --- */
+.ios-appicon {
+  width: 2.5rem; height: 2.5rem;
+  border-radius: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(0,0,0,.12), inset 0 1px 0 rgba(255,255,255,.35);
+}
+
+/* --- Sidebar estilo iOS --- */
+aside#sidebar {
+  background: rgba(255,255,255,.6) !important;
+  backdrop-filter: blur(32px) saturate(210%) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(210%) !important;
+}
+[data-theme="night"] aside#sidebar {
+  background: rgba(14,16,22,.78) !important;
+  backdrop-filter: blur(32px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(180%) !important;
+}
+.nav-item { border-radius: 1rem !important; }
+.nav-item:hover { transform: translateX(2px); }
+
+/* --- Botones: pills iOS --- */
+button { -webkit-tap-highlight-color: transparent; }
+section button:active { transform: scale(.97); }
+
+/* --- Terminal: ventana macOS/iOS --- */
+#terminalOutput, #chatLog {
+  border-radius: 1.25rem !important;
+}

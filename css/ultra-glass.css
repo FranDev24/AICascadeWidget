@@ -1,0 +1,259 @@
+/* ==========================================================================
+   AICascade Widget — ULTRA Liquid Glass (v20261019f)
+   Capa MAESTRA de efectos visuales: glassmorfismo extremo, bisel especular,
+   texto metálico, resortes magnéticos, anillos con glow, shimmer, aurora,
+   toast, terminal. CARGA ÚLTIMA para ganar en cascada.
+   SOLO VISUAL: no toca IDs, onclick, JS ni lógica de backend.
+   ========================================================================== */
+
+/* ----- 0. Fondo aurora vivo (reemplaza capas estáticas del HTML) ----- */
+body::after {
+  content: "";
+  position: fixed;
+  inset: -20vmax;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(38vmax 26vmax at 12% 8%, rgba(96,165,250,.18), transparent 62%),
+    radial-gradient(42vmax 30vmax at 88% 10%, rgba(167,139,250,.16), transparent 62%),
+    radial-gradient(60vmax 42vmax at 50% 108%, rgba(56,189,248,.12), transparent 62%),
+    radial-gradient(30vmax 22vmax at 78% 68%, rgba(52,211,153,.09), transparent 60%);
+  animation: ultra-aurora 24s ease-in-out infinite alternate;
+  will-change: transform;
+}
+@keyframes ultra-aurora {
+  0% { transform: translate3d(-2%, -1%, 0) scale(1) rotate(0deg); }
+  50% { transform: translate3d(2%, 2%, 0) scale(1.05) rotate(2deg); }
+  100% { transform: translate3d(-1%, 1%, 0) scale(1.02) rotate(-2deg); }
+}
+[data-theme="night"] body::after {
+  background:
+    radial-gradient(38vmax 26vmax at 12% 8%, rgba(56,189,248,.11), transparent 62%),
+    radial-gradient(42vmax 30vmax at 88% 10%, rgba(167,139,250,.11), transparent 62%),
+    radial-gradient(60vmax 42vmax at 50% 108%, rgba(99,102,241,.13), transparent 62%),
+    radial-gradient(30vmax 22vmax at 78% 68%, rgba(52,211,153,.06), transparent 60%);
+}
+
+/* ----- 1. Cristal extremo: blur 36px + saturación ----- */
+.glass-card {
+  backdrop-filter: blur(36px) saturate(220%) !important;
+  -webkit-backdrop-filter: blur(36px) saturate(220%) !important;
+}
+[data-theme="night"] .glass-card {
+  backdrop-filter: blur(36px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(36px) saturate(190%) !important;
+}
+
+/* ----- 2. Bisel especular 1px (borde de vidrio refractado) ----- */
+.glass-card { position: relative; }
+.glass-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg,
+    rgba(255,255,255,.70),
+    rgba(255,255,255,.10) 35%,
+    rgba(255,255,255,.02) 55%,
+    rgba(255,255,255,.45));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 4;
+}
+
+/* ----- 3. Sombras volumétricas ----- */
+section .glass-card {
+  box-shadow:
+    0 30px 60px rgba(0,0,0,.10),
+    0 4px 12px rgba(0,0,0,.05),
+    inset 0 1px 0 rgba(255,255,255,.85) !important;
+}
+[data-theme="night"] section .glass-card {
+  box-shadow:
+    0 30px 70px rgba(0,0,0,.55),
+    0 4px 14px rgba(0,0,0,.40),
+    inset 0 1px 0 rgba(255,255,255,.10),
+    0 0 40px rgba(99,102,241,.05) !important;
+}
+
+/* ----- 4. Texto met�lico reflectante ----- */
+#panelTitle, #activeModel, .liquid-text {
+  background: linear-gradient(180deg,
+    currentColor 30%,
+    rgba(255,255,255,.60) 50%,
+    currentColor 70%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  text-shadow: 0 1px 12px rgba(96,165,250,.15);
+}
+[data-theme= night] #panelTitle,
+[data-theme=night] #activeModel,
+[data-theme=night] .liquid-text {
+  text-shadow: 0 0 24px rgba(96,165,250,.25);
+}
+
+/* Gradiente animado liquid text para .liquid-text */
+.liquid-text {
+  background: linear-gradient(100deg,
+    #0f172a 12%, #1e40af 30%, #0a84ff 44%, #0f172a 58%, #1e40af 78%, #0f172a 96%) !important;
+  background-size: 220% 100% !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+  animation: liquidText 7s ease-in-out infinite alternate !important;
+  filter: drop-shadow(0 1px 0 rgba(255,255,255,.4)) drop-shadow(0 6px 18px rgba(10,132,255,.20)) !important;
+}
+[data-theme=night] .liquid-text {
+  background: linear-gradient(100deg,
+    #f5f5f7 12%, #7dd3fc 30%, #38bdf8 44%, #f5f5f7 58%, #818cf8 78%, #f5f5f7 96%) !important;
+  filter: drop-shadow(0 1px 0 rgba(255,255,255,.08)) drop-shadow(0 0 22px rgba(56,189,248,.28)) !important;
+}
+@keyframes liquidText {
+  from { background-position: 0% 50%; }
+  to { background-position: 100% 50%; }
+}
+
+/* ----- 5. F�sica de resortes: hover magn�tico ----- */
+.glass-card,
+button,
+.ios-btn,
+.nav-item,
+.ios-tile {
+  transition:
+    transform .45s cubic-bezier(.16,1,.3,1),
+    box-shadow .45s cubic-bezier(.16,1,.3,1),
+    background .3s ease,
+    border-color .3s ease !important;
+}
+.glass-card:hover {
+  transform: scale(1.015) translateY(-3px) !important;
+}
+.ios-tile:hover {
+  transform: translateY(-2px) scale(1.05) !important;
+  filter: saturate(1.3) brightness(1.05) !important;
+}
+button:hover, .ios-btn:hover {
+  transform: translateY(-1px);
+}
+button:active, .ios-btn:active {
+  transform: scale(.94) !important;
+  transition-duration: .12s !important;
+}
+
+/* ----- 6. Shimmer de luz barriendo (clase opcional) ----- */
+.glass-card { overflow: hidden; }
+.ultra-shine {
+  position: absolute;
+  top: -60%; bottom: -60%;
+  left: -30%;
+  width: 36%;
+  transform: rotate(18deg);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.14), transparent);
+  pointer-events: none;
+  z-index: 1;
+  animation: ultra-shine 9s ease-in-out infinite;
+}
+@keyframes ultra-shine {
+  0%, 55% { left: -40%; opacity: 0; }
+  65% { opacity: 1; }
+  85%, 100% { left: 130%; opacity: 0; }
+}
+
+/* ----- 7. Anillo de tokens con glow pulsante ----- */
+.ios-ring {
+  filter: drop-shadow(0 0 14px rgba(16,185,129,.35)) !important;
+  transition: filter .5s ease, transform .4s cubic-bezier(.16,1,.3,1);
+}
+.ios-ring:hover {
+  filter: drop-shadow(0 0 24px rgba(16,185,129,.6)) !important;
+  transform: scale(1.05);
+}
+#iosRing {
+  animation: ultra-ring-breathe 3.2s ease-in-out infinite;
+}
+@keyframes ultra-ring-breathe {
+  0%,100% { filter: drop-shadow(0 0 10px rgba(16,185,129,.25)); }
+  50% { filter: drop-shadow(0 0 22px rgba(16,185,129,.5)); }
+}
+
+/* ----- 8. Dynamic Island con halo ----- */
+.dynamic-island, .ios-island {
+  box-shadow:
+    0 8px 24px rgba(0,0,0,.30),
+    0 0 24px rgba(96,165,250,.18),
+    inset 0 1px 0 rgba(255,255,255,.15) !important;
+}
+
+/* ----- 9. Iconos acolchados (ios-tile) con brillo hover ----- */
+.ios-tile {
+  position: relative;
+  overflow: hidden;
+}
+.ios-tile::after {
+  content: ";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(255,255,255,.55), transparent 55%);
+  pointer-events: none;
+  z-index: 1;
+  opacity: .7;
+}
+
+/* ----- 10. Terminal / chat con resplandor ----- */
+#terminalOutput,
+#panel-terminal .glass-card {
+  box-shadow:
+    inset 0 0 60px rgba(0,0,0,.5),
+    0 0 32px rgba(52,211,153,.06) !important;
+}
+
+/* ----- 11. Scrollbar cristalina ----- */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(96,165,250,.4), rgba(167,139,250,.4));
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+/* ----- 12. Entrada de paneles: cascada escalonada ----- */
+@keyframes ultra-rise {
+  from { opacity: 0; transform: translateY(26px) scale(.985); filter: blur(6px); }
+  to { opacity: 1; transform: none; filter: blur(0); }
+}
+main section:not(.hidden) > div.glass-card {
+  animation: ultra-rise .7s cubic-bezier(.16,1,.3,1) both;
+}
+main section:not(.hidden) > div.glass-card:nth-child(2) { animation-delay: .06s; }
+main section:not(.hidden) > div.glass-card:nth-child(3) { animation-delay: .12s; }
+main section:not(.hidden) > div.glass-card:nth-child(4) { animation-delay: .18s; }
+
+/* ----- 13. Toast con glow ----- */
+#toast {
+  backdrop-filter: blur(28px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(200%) !important;
+  box-shadow:
+    0 20px 50px rgba(0,0,0,.20),
+    0 0 30px rgba(52,211,153,.12),
+    inset 0 1px 0 rgba(255,255,255,.50) !important;
+}
+
+/* ----- 14. Respetar movimiento reducido y optimizar m�vil ----- */
+@media (prefers-reduced-motion: reduce) {
+  body::after,
+  .ultra-shine,
+  #iosRing,
+  .liquid-text,
+  #aurora .blob {
+    animation: none !important;
+  }
+}
+@media (max-width: 768px) {
+  body::after { animation-duration: 40s; }
+  .ultra-shine { display: none; }
+}

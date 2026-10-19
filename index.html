@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>AICascade Widget | Gestor de Cascada IA</title>
-  <meta name="description" content="HUD Liquid Glass para gestionar tu cascada de modelos IA con failover automatico, vault de API keys y terminal super admin.">
-  <!-- PWA / iPhone 16 Pro (iOS 18) -->
+  <meta name="description" content="HUD Liquid Glass iOS 18 Pro para gestionar tu cascada de modelos IA con failover automatico, vault de API keys y terminal super admin.">
+  <!-- PWA / iPhone 18 Pro (iOS 18) -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -19,20 +19,26 @@
   <!-- Open Graph para WhatsApp -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="AICascade Widget — Gestor de Cascada IA">
-  <meta property="og:description" content="HUD Liquid Glass: failover automatico entre 9 modelos IA, vault de API keys y terminal super admin. Instalable en iPhone.">
+  <meta property="og:description" content="HUD Liquid Glass iOS 18 Pro: failover automatico entre 9 modelos IA, vault de API keys y terminal super admin. Instalable en iPhone.">
   <meta property="og:image" content="icons/og-cover.png">
   <meta name="twitter:card" content="summary_large_image">
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css?v=20261019c">
   <link rel="stylesheet" href="css/iphone.css?v=20261019c">
+  <link rel="stylesheet" href="css/ios-dashboard.css?v=20261019d">
+  <link rel="stylesheet" href="css/liquid.css?v=lq1">
+  <link rel="stylesheet" href="css/iosapp.css?v=iapp1">
+  <link rel="stylesheet" href="css/ultra-glass.css?v=20261019f">
+  <link rel="stylesheet" href="css/iphone18pro.css?v=p18a">
+  <link rel="stylesheet" href="css/18pro-finish.css?v=f1">
   <script>
     tailwind.config = {
       darkMode: 'class',
       theme: {
         extend: {
           fontFamily: {
-            sans: ['Inter', 'sans-serif'],
+            sans: ['Inter', '-apple-system', 'SF Pro Text', 'sans-serif'],
             mono: ['JetBrains Mono', 'monospace'],
           },
           colors: {
@@ -77,15 +83,15 @@
 </head>
 <body class="bg-gray-50 text-gray-900 antialiased h-screen w-screen overflow-hidden transition-colors duration-500 font-sans selection:bg-blue-500 selection:text-white">
 
-  <!-- Capa de vidrio de fondo (Liquid Glass) -->
-  <div class="fixed inset-0 bg-[url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2574&auto=format&fit=crop')] bg-cover bg-center opacity-10 blur-[3px] pointer-events-none"></div>
-  <div class="fixed inset-0 bg-gradient-to-br from-transparent to-blue-50/20 pointer-events-none"></div>
+  <!-- Wallpaper mesh iOS 18 + gradiente superior -->
+  <div id="iosWallpaper" aria-hidden="true"></div>
 
-  <!-- ========== SIDEBAR (NAVEGACIÓN) ========== -->
-  <aside id="sidebar" class="fixed left-0 top-0 h-full w-64 bg-white/10 backdrop-blur-xl border-r border-white/20 z-40 transition-all duration-300 flex flex-col overflow-y-auto">
+
+  <!-- ========== SIDEBAR (NAVEGACIÓN iOS) ========== -->
+  <aside id="sidebar" class="fixed left-0 top-0 h-full w-64 bg-white/10 backdrop-blur-2xl border-r border-white/20 z-40 transition-all duration-300 flex flex-col overflow-y-auto">
     <div class="flex items-center justify-between h-16 border-b border-white/20 bg-white/5 px-4">
       <div class="flex items-center gap-3">
-        <div class="w-9 h-9 bg-gradient-to-br from-blue-400 to-purple-500 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30">
+        <div class="w-9 h-9 bg-gradient-to-br from-blue-400 to-purple-500 rounded-[0.8rem] flex items-center justify-center shadow-lg shadow-blue-500/30">
           <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
         </div>
         <span class="font-bold text-sm tracking-tight text-gray-800" id="sidebarBrand">AICascade</span>
@@ -117,7 +123,7 @@
         <span class="font-medium text-gray-800">Terminal</span>
       </button>
       <button onclick="app.switchPanel('shortcuts')" class="nav-item w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all duration-200 text-gray-600 hover:bg-white/20 hover:text-gray-900" id="nav-shortcuts">
-        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
         <span class="font-medium text-gray-800">Atajos</span>
       </button>
     </nav>
@@ -134,141 +140,210 @@
   <main class="ml-64 h-full overflow-y-auto p-6 md:p-10 relative z-10">
 
     <!-- Header superior -->
-    <header class="flex flex-col md:flex-row md:items-center justify-between mb-8 animate-slide-up">
+    <header class="flex flex-col md:flex-row md:items-center justify-between mb-8 animate-slide-up gap-3">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900 tracking-tight" id="panelTitle">Panel Principal</h1>
-        <p class="text-gray-500 text-sm mt-1" id="panelSubtitle">Estado en tiempo real del sistema de cascada de IA</p>
+        <h1 class="text-[1.65rem] font-bold text-gray-900 tracking-tight ios-clean-title" id="panelTitle">Panel Principal</h1>
+        <p class="text-gray-500 text-sm mt-0.5" id="panelSubtitle">Estado en tiempo real del sistema de cascada de IA</p>
       </div>
       <div class="flex items-center gap-3 mt-4 md:mt-0">
-        <button onclick="app.openPalette()" title="Command palette (Ctrl+K)" class="hidden sm:flex items-center gap-2 text-xs font-medium text-gray-500 px-3 py-1.5 rounded-full bg-white/50 border border-white/50 hover:bg-white/80 transition-all">
+        <!-- Dynamic Island (centro) -->
+        <div class="dynamic-island hidden md:inline-flex ml-auto mr-2" id="dynamicIsland" data-state="offline" title="Estado del sistema">
+          <span class="di-dot"></span>
+          <span class="di-label text-[10px] uppercase tracking-[0.14em] font-semibold">Cascade</span>
+          <span class="di-sep"></span>
+          <span class="di-time text-xs">--:--:--</span>
+        </div>
+
+        <button onclick="app.openPalette()" data-tip="Command Palette · Ctrl+K" title="Command palette (Ctrl+K)" class="hidden sm:flex items-center gap-2 text-xs font-medium text-gray-500 px-3 py-1.5 rounded-full bg-white/50 border border-white/50 hover:bg-white/80 transition-all duration-300">
           ⌘K <span class="hidden lg:inline">Comandos…</span>
         </button>
-        <button onclick="app.openSettings()" title="Ajustes" class="hidden sm:flex items-center justify-center w-8 h-8 rounded-full bg-white/50 border border-white/50 hover:bg-white/80 transition-all">⚙️</button>
+        <button onclick="app.openSettings()" data-tip="Ajustes" title="Ajustes" class="hidden sm:flex items-center justify-center w-8 h-8 rounded-full bg-white/50 border border-white/50 hover:bg-white/80 transition-all duration-300">⚙️</button>
         <div id="backendStatus" class="hidden sm:flex items-center gap-2 text-xs font-medium text-gray-500 px-3 py-1.5 rounded-full bg-white/50 border border-white/50">
           <span class="w-2 h-2 rounded-full bg-gray-400"></span><span>Backend …</span>
         </div>
-        <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold shadow-lg shadow-blue-500/30">AC</div>
+        <div class="h-10 w-10 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold shadow-lg shadow-blue-500/30">AC</div>
         <span class="hidden sm:block text-right">
-          <div class="text-sm font-medium text-gray-900" id="currentTime">00:00:00</div>
+          <div class="text-sm font-medium text-gray-900 ios-num" id="currentTime">00:00:00</div>
           <div class="text-xs text-gray-500" id="currentDate">--/--/----</div>
         </span>
       </div>
     </header>
 
-    <!-- ========== PANEL: DASHBOARD ========== -->
-    <section id="panel-dashboard" class="space-y-6">
+    <!-- ========== PANEL: DASHBOARD (GRID iOS DE WIDGETS) ========== -->
+    <section id="panel-dashboard" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
 
-      <!-- Tarjeta estado cascada -->
-      <div class="glass-card p-6 rounded-2xl shadow-xl border border-white/40 animate-slide-up">
-        <div class="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6">
-          <div>
-            <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Cascada de IA</h2>
-            <p class="text-2xl font-bold text-gray-900 mt-1" id="activeModel">Ninguno</p>
+      <!-- WIDGET HERO: Estado de la cascada + Gauge circular -->
+      <div class="glass-card p-6 md:col-span-2 lg:col-span-3 ios-hero-glow animate-slide-up">
+        <div class="relative z-[3] flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div class="min-w-0">
+            <span class="ios-chip mb-3">
+              <span class="w-1.5 h-1.5 rounded-full mx-1" style="background:var(--ios-accent)"></span>
+              FAILover ENGINE · CASCADA DE IA
+            </span>
+            <p class="text-[1.9rem] leading-tight font-bold text-gray-900 tracking-tight break-words ios-clean-title" id="activeModel">Ninguno</p>
             <p class="text-sm text-gray-500 mt-1" id="activeTier">Sin asignar</p>
-          </div>
-          <div class="flex gap-2">
-            <button onclick="cascade.runFailover()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-all shadow-lg shadow-blue-500/30 flex items-center gap-2">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-              Forzar Conmutación
-            </button>
-            <button onclick="app.switchPanel('providers')" class="px-4 py-2 bg-white/50 hover:bg-white/70 text-gray-700 rounded-lg text-sm font-medium transition-all border border-white/50 flex items-center gap-2">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.586m13.48 2.48a12 12 0 01-.348 1.574L20 17l-.586-1.586a6 6 0 10-8.486-8.486L12.414 3l1.586 1.586a6 6 0 100 8.486l-1.586 1.586z"></path></svg>
-              Proveedores
-            </button>
-          </div>
-        </div>
-
-        <!-- Medidor de tokens -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div class="glass-card p-5 rounded-xl border border-white/30">
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-medium text-gray-500">Tokens Totales</span>
-              <span class="text-xs font-bold text-gray-900" id="totalTokens">0 / 0</span>
-            </div>
-            <div class="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
-              <div id="tokenBarTotal" class="bg-blue-500 h-full rounded-full transition-all duration-500 w-0"></div>
-            </div>
-            <p class="text-xs text-gray-400 mt-2">Uso general del sistema</p>
-          </div>
-          <div class="glass-card p-5 rounded-xl border border-white/30">
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-medium text-gray-500">Tokens Restantes</span>
-              <span class="text-xs font-bold text-green-600" id="remainingTokens">0 (0%)</span>
-            </div>
-            <div class="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
-              <div id="tokenBarRemaining" class="bg-green-500 h-full rounded-full transition-all duration-500 w-100"></div>
-            </div>
-            <p class="text-xs text-gray-400 mt-2">Disponible antes de conmutar</p>
-          </div>
-          <div class="glass-card p-5 rounded-xl border border-white/30">
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-medium text-gray-500">Estado</span>
-              <span class="flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse" id="statusDot"></span>
-                <span class="text-xs font-bold text-gray-700" id="statusText">Óptimo</span>
-              </span>
-            </div>
-            <div class="mt-2 flex items-center gap-2 text-xs">
-              <span class="px-2 py-1 rounded bg-blue-50 text-blue-700 font-medium text-xs">Conmutaciones: <span id="switchCount">0</span></span>
-              <span class="px-2 py-1 rounded bg-purple-50 text-purple-700 font-medium text-xs">Llamadas: <span id="callCount">0</span></span>
-            </div>
-            <div class="glass-card p-5 rounded-xl border border-white/30">
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-xs font-medium text-gray-500">Métricas Reales</span>
-                <button onclick="cascade.resetUsage(); app.render();" title="Reiniciar contadores" class="text-xs text-gray-400 hover:text-gray-700">↺ reset</button>
-              </div>
-              <div class="mt-2 flex flex-wrap items-center gap-2 text-xs" id="metricsRow">
-                <span class="px-2 py-1 rounded bg-emerald-50 text-emerald-700 font-medium">Lat media: <span id="metricLatency">0ms</span></span>
-                <span class="px-2 py-1 rounded bg-amber-50 text-amber-700 font-medium">Errores: <span id="metricErrors">0%</span></span>
-                <span class="px-2 py-1 rounded bg-slate-100 text-slate-700 font-medium">Tokens I/O: <span id="metricIO">0/0</span></span>
-              </div>
+            <div class="flex flex-wrap items-center gap-2 mt-4">
+              <button onclick="cascade.runFailover()" class="ios-btn ios-btn-primary">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                Forzar Conmutación
+              </button>
+              <button onclick="app.switchPanel('providers')" class="ios-btn ios-btn-secondary">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.586m13.48 2.48a12 12 0 01-.348 1.574L20 17l-.586-1.586a6 6 0 10-8.486-8.486L12.414 3l1.586 1.586a6 6 0 100 8.486l-1.586 1.586z"></path></svg>
+                Proveedores
+              </button>
             </div>
           </div>
-        </div>
-
-        <!-- Visor jerárquico de modelos -->
-        <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div class="glass-card p-5 rounded-xl border border-white/30 model-tier tier-1 relative overflow-hidden group">
-            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-purple-600 opacity-20"></div>
-            <h3 class="text-xs font-bold text-blue-600 uppercase tracking-wider mb-3 flex items-center gap-2">
-              <span class="w-2 h-2 rounded-full bg-blue-500"></span>
-              Nivel 1 — Ultra
-            </h3>
-            <ul class="space-y-2 text-sm text-gray-600" id="tier1Models">
-              <!-- Se llena por JS -->
-            </ul>
-          </div>
-          <div class="glass-card p-5 rounded-xl border border-white/30 model-tier tier-2 relative overflow-hidden group">
-            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-400 to-orange-500 opacity-20"></div>
-            <h3 class="text-xs font-bold text-amber-600 uppercase tracking-wider mb-3 flex items-center gap-2">
-              <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-              Nivel 2 — Mid
-            </h3>
-            <ul class="space-y-2 text-sm text-gray-600" id="tier2Models"></ul>
-          </div>
-          <div class="glass-card p-5 rounded-xl border border-white/30 model-tier tier-3 relative overflow-hidden group">
-            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-400 to-emerald-500 opacity-20"></div>
-            <h3 class="text-xs font-bold text-green-600 uppercase tracking-wider mb-3 flex items-center gap-2">
-              <span class="w-2 h-2 rounded-full bg-green-500"></span>
-              Nivel 3 — Light
-            </h3>
-            <ul class="space-y-2 text-sm text-gray-600" id="tier3Models"></ul>
-          </div>
-        </div>
-
-        <!-- Registro de actividad -->
-        <div class="mt-8 glass-card p-5 rounded-xl border border-white/30">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-sm font-bold text-gray-700">Registro de Actividad</h3>
-            <span class="text-xs text-gray-400">Últimos eventos</span>
-          </div>
-          <div class="h-40 overflow-y-auto space-y-2" id="activityLog">
-            <div class="flex items-start gap-3 text-sm">
-              <div class="w-2 h-2 rounded-full bg-green-400 mt-1 flex-shrink-0"></div>
+          <!-- Gauge circular SVG (arco de trazo; sincronizado con tokenBarTotal por UI glue) -->
+          <div class="shrink-0 mx-auto lg:mr-8 ios-widget-ring relative" id="iosRing" data-tone="ok">
+            <svg width="132" height="132" viewBox="0 0 132 132" aria-hidden="true" class="ios-ring-svg">
+              <circle class="ring-track" cx="66" cy="66" r="56" fill="none"></circle>
+              <circle class="ring-prog" id="iosRingProg" cx="66" cy="66" r="56" fill="none"
+                transform="rotate(-90 66 66)"></circle>
+            </svg>
+            <div class="ios-ring-inner">
               <div>
-                <div class="text-gray-700 font-medium">Sistema iniciado</div>
-                <div class="text-gray-500 text-xs">Gestor de cascada listo</div>
+                <b class="ios-num" id="iosRingVal">0%</b>
+                <span class="block">CUOTA USADA</span>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- WIDGET: Estado del sistema -->
+      <div class="glass-card p-6 animate-slide-up">
+        <div class="flex items-center justify-between mb-4">
+          <div class="ios-tile" style="background:linear-gradient(160deg,rgba(48,209,88,0.18),rgba(48,209,88,0.08));">
+            <span class="w-2.5 h-2.5 rounded-full bg-green-400 animate-pulse" id="statusDot"></span>
+          </div>
+          <span class="text-[10px] font-semibold uppercase tracking-[0.12em] text-gray-400">SALUD</span>
+        </div>
+        <p class="text-lg font-bold text-gray-900 tracking-tight" id="statusText">Óptimo</p>
+        <p class="text-xs text-gray-500 mt-1" id="statusHint">Cascada operativa</p>
+        <div class="flex flex-wrap gap-2 mt-4">
+          <span class="ios-chip">Conmutaciones <b class="ios-num" id="switchCount">0</b></span>
+          <span class="ios-chip">Llamadas <b class="ios-num" id="callCount">0</b></span>
+        </div>
+      </div>
+
+      <!-- WIDGET: Tokens (Totales + Restantes) -->
+      <div class="glass-card p-6 md:col-span-2 animate-slide-up">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-3">
+            <div class="ios-tile" style="background:linear-gradient(160deg,rgba(10,132,255,0.16),rgba(10,132,255,0.07));">
+              <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m-6 4h6m-6 4h9M6 3h12a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V5a2 2 0 012-2z"></path></svg>
+            </div>
+            <div>
+              <h3 class="text-sm font-semibold text-gray-900 tracking-tight">Consumo de Tokens</h3>
+              <p class="text-[11px] text-gray-500">Ventana activa del modelo</p>
+            </div>
+          </div>
+          <span class="text-[10px] font-semibold uppercase tracking-[0.12em] text-gray-400">EN VIVO</span>
+        </div>
+
+        <div class="mb-5">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-medium text-gray-500">Tokens Totales</span>
+            <span class="text-xs font-bold text-gray-900 ios-num" id="totalTokens">0 / 0</span>
+          </div>
+          <div class="ios-progress">
+            <div id="tokenBarTotal" class="bg-blue-500 w-0"></div>
+          </div>
+          <p class="text-[11px] text-gray-400 mt-1.5">Uso general del sistema</p>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-medium text-gray-500">Tokens Restantes</span>
+            <span class="text-xs font-bold text-green-600 ios-num" id="remainingTokens">0 (0%)</span>
+          </div>
+          <div class="ios-progress">
+            <div id="tokenBarRemaining" class="bg-green-500 w-full"></div>
+          </div>
+          <p class="text-[11px] text-gray-400 mt-1.5">Disponible antes de conmutar</p>
+        </div>
+      </div>
+
+      <!-- WIDGET: Métricas reales -->
+      <div class="glass-card p-6 animate-slide-up">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-3">
+            <div class="ios-tile" style="background:linear-gradient(160deg,rgba(94,92,230,0.16),rgba(94,92,230,0.07));">
+              <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            </div>
+            <h3 class="text-sm font-semibold text-gray-900 tracking-tight">Métricas Reales</h3>
+          </div>
+          <button onclick="cascade.resetUsage(); app.render();" title="Reiniciar contadores" class="text-[11px] text-gray-400 hover:text-gray-700 transition-colors ios-num">↺ reset</button>
+        </div>
+        <div class="space-y-2.5">
+          <div class="flex items-center justify-between rounded-2xl px-4 py-2.5" style="background:var(--ios-pill);border:1px solid var(--ios-glass-border);">
+            <span class="text-xs text-gray-500 font-medium">Latencia media</span>
+            <span class="text-xs font-bold text-emerald-600 ios-num" id="metricLatency">0ms</span>
+          </div>
+          <div class="flex items-center justify-between rounded-2xl px-4 py-2.5" style="background:var(--ios-pill);border:1px solid var(--ios-glass-border);">
+            <span class="text-xs text-gray-500 font-medium">Errores</span>
+            <span class="text-xs font-bold text-amber-600 ios-num" id="metricErrors">0%</span>
+          </div>
+          <div class="flex items-center justify-between rounded-2xl px-4 py-2.5" style="background:var(--ios-pill);border:1px solid var(--ios-glass-border);">
+            <span class="text-xs text-gray-500 font-medium">Tokens I/O</span>
+            <span class="text-xs font-bold text-gray-800 ios-num" id="metricIO">0/0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- WIDGET: Nivel 1 — Ultra -->
+      <div class="glass-card p-5 model-tier tier-1 relative overflow-hidden animate-slide-up">
+        <div class="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-blue-500 to-purple-600 opacity-25"></div>
+        <div class="flex items-center justify-between mb-3">
+          <div class="ios-tile" style="background:linear-gradient(160deg,rgba(10,132,255,0.18),rgba(10,132,255,0.08));">
+            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
+          </div>
+          <span class="di-dot" style="background:var(--ios-accent);box-shadow:0 0 8px rgba(10,132,255,.8);"></span>
+        </div>
+        <h3 class="text-[10px] font-bold text-blue-600 uppercase tracking-[0.14em] mb-2">Nivel 1 — Ultra</h3>
+        <ul class="space-y-2 text-sm text-gray-600" id="tier1Models">
+          <!-- Se llena por JS -->
+        </ul>
+      </div>
+
+      <!-- WIDGET: Nivel 2 — Mid -->
+      <div class="glass-card p-5 model-tier tier-2 relative overflow-hidden animate-slide-up">
+        <div class="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-amber-400 to-orange-500 opacity-25"></div>
+        <div class="flex items-center justify-between mb-3">
+          <div class="ios-tile" style="background:linear-gradient(160deg,rgba(255,159,10,0.18),rgba(255,159,10,0.08));">
+            <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          </div>
+          <span class="di-dot" style="background:var(--ios-amber);box-shadow:0 0 8px rgba(255,159,10,.8);"></span>
+        </div>
+        <h3 class="text-[10px] font-bold text-amber-600 uppercase tracking-[0.14em] mb-2">Nivel 2 — Mid</h3>
+        <ul class="space-y-2 text-sm text-gray-600" id="tier2Models"></ul>
+      </div>
+
+      <!-- WIDGET: Nivel 3 — Light -->
+      <div class="glass-card p-5 model-tier tier-3 relative overflow-hidden animate-slide-up">
+        <div class="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-green-400 to-emerald-500 opacity-25"></div>
+        <div class="flex items-center justify-between mb-3">
+          <div class="ios-tile" style="background:linear-gradient(160deg,rgba(48,209,88,0.18),rgba(48,209,88,0.08));">
+            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 19h8m-14-2h14m-16-6h16M7 5h14M7 5l-4 4 4 4M19 15l4-4-4-4"></path></svg>
+          </div>
+          <span class="di-dot" style="background:var(--ios-green);box-shadow:0 0 8px rgba(48,209,88,.8);"></span>
+        </div>
+        <h3 class="text-[10px] font-bold text-green-600 uppercase tracking-[0.14em] mb-2">Nivel 3 — Light</h3>
+        <ul class="space-y-2 text-sm text-gray-600" id="tier3Models"></ul>
+      </div>
+
+      <!-- WIDGET: Registro de actividad -->
+      <div class="glass-card p-5 md:col-span-2 lg:col-span-1 animate-slide-up">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.14em]">Actividad</h3>
+          <span class="text-[10px] text-gray-400">en vivo</span>
+        </div>
+        <div class="h-44 overflow-y-auto space-y-2 pr-1" id="activityLog">
+          <div class="flex items-start gap-3 text-sm">
+            <div class="w-2 h-2 rounded-full bg-green-400 mt-1 flex-shrink-0"></div>
+            <div>
+              <div class="text-gray-700 font-medium">Sistema iniciado</div>
+              <div class="text-gray-500 text-xs">Gestor de cascada listo</div>
             </div>
           </div>
         </div>
@@ -278,27 +353,37 @@
 
     <!-- ========== PANEL: CHAT IA (Backend con failover) ========== -->
     <section id="panel-chat" class="hidden space-y-6">
-      <div class="glass-card p-6 rounded-2xl shadow-xl border border-white/40 animate-slide-up">
-        <div class="flex items-center justify-between mb-4">
-          <div>
-            <h2 class="text-lg font-bold text-gray-900">Chat IA — Cascada con Failover</h2>
-            <p class="text-gray-500 text-sm">Usa el backend FastAPI (OpenAI → DeepSeek → Ollama → simulado)</p>
+      <div class="glass-card p-6 animate-slide-up">
+        <div class="flex items-center justify-between mb-4 gap-3">
+          <div class="flex items-center gap-3">
+            <div class="ios-tile" style="background:linear-gradient(160deg,rgba(94,92,230,0.18),rgba(94,92,230,0.08));">
+              <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+            </div>
+            <div>
+              <h2 class="text-lg font-bold text-gray-900 tracking-tight">Chat IA — Cascada con Failover</h2>
+              <p class="text-gray-500 text-xs">Backend FastAPI · OpenAI → DeepSeek → Ollama → simulado</p>
+            </div>
           </div>
           <span id="chatMode" class="text-xs font-medium px-2.5 py-1 rounded-full bg-gray-100 text-gray-600">modo: local</span>
         </div>
-        <div id="chatLog" class="h-64 overflow-y-auto space-y-3 p-4 rounded-xl bg-black/5 border border-white/30 mb-4"></div>
+        <div id="chatLog" class="h-64 overflow-y-auto space-y-3 p-4 rounded-2xl mb-4 border" style="background:var(--ios-pill);border-color:var(--ios-glass-border);"></div>
         <div class="flex gap-2">
           <input id="chatInput" type="text" placeholder="Escribe tu mensaje y pulsa Enter…"
             class="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 bg-white/80 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50">
-          <button onclick="app.sendChat()" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-medium transition-all shadow-lg shadow-blue-500/30">Enviar</button>
+          <button onclick="app.sendChat()" class="ios-btn ios-btn-primary">Enviar</button>
         </div>
       </div>
     </section>
 
     <!-- ========== PANEL: PROVEEDORES ========== -->
     <section id="panel-providers" class="hidden space-y-6">
-      <div class="glass-card p-6 rounded-2xl shadow-xl border border-white/40 animate-slide-up">
-        <h2 class="text-lg font-bold text-gray-900 mb-6">Proveedores de IA</h2>
+      <div class="glass-card p-6 animate-slide-up">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="ios-tile" style="background:linear-gradient(160deg,rgba(10,132,255,0.16),rgba(10,132,255,0.07));">
+            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+          </div>
+          <h2 class="text-lg font-bold text-gray-900 tracking-tight">Proveedores de IA</h2>
+        </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="providersGrid">
           <!-- Llenado por JS -->
         </div>
@@ -307,22 +392,25 @@
 
     <!-- ========== PANEL: VAULT API ========== -->
     <section id="panel-vault" class="hidden space-y-6">
-      <div class="glass-card p-6 rounded-2xl shadow-xl border border-white/40 animate-slide-up">
+      <div class="glass-card p-6 animate-slide-up">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-          <div>
-            <h2 class="text-lg font-bold text-gray-900">Vault de Credenciales</h2>
-            <p class="text-gray-500 text-sm">Almacena y gestiona tus claves de API de forma local</p>
+          <div class="flex items-center gap-3">
+            <div class="ios-tile" style="background:linear-gradient(160deg,rgba(255,159,10,0.2),rgba(255,159,10,0.08));">
+              <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+            </div>
+            <div>
+              <h2 class="text-lg font-bold text-gray-900 tracking-tight">Vault de Credenciales</h2>
+              <p class="text-gray-500 text-xs">Claves cifradas · sync automático al backend</p>
+            </div>
           </div>
           <div class="flex flex-wrap items-center gap-2">
             <input id="vaultSearch" type="text" placeholder="Buscar proveedor…" oninput="vault.search(this.value)"
               class="px-3 py-2 rounded-lg border border-gray-200 bg-white/80 text-sm w-44 focus:outline-none focus:ring-2 focus:ring-blue-500/50">
-            <button onclick="vault.exportKeys()" title="Exportar backup JSON" class="px-3 py-2 glass-card rounded-lg text-sm font-medium transition-all hover:scale-[1.03]">⤓ Export</button>
-            <label class="px-3 py-2 glass-card rounded-lg text-sm font-medium cursor-pointer transition-all hover:scale-[1.03]">⤒ Import
+            <button onclick="vault.exportKeys()" title="Exportar backup JSON" class="ios-btn ios-btn-secondary !px-3.5 !py-2 !text-xs">⤓ Export</button>
+            <label class="ios-btn ios-btn-secondary !px-3.5 !py-2 !text-xs cursor-pointer">⤒ Import
               <input type="file" accept=".json,application/json" class="hidden" onchange="vault.importKeys(this.files[0]); this.value=''">
             </label>
-            <button onclick="vault.showAddForm()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-all shadow-lg shadow-blue-500/30">
-              + Agregar Clave
-            </button>
+            <button onclick="vault.showAddForm()" class="ios-btn ios-btn-primary !px-3.5 !py-2 !text-xs">+ Agregar Clave</button>
           </div>
         </div>
         <div class="space-y-3" id="vaultList">
@@ -348,7 +436,7 @@
           </div>
           <div class="flex justify-end gap-2">
             <button onclick="vault.hideAddForm()" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg text-sm transition-colors">Cancelar</button>
-            <button onclick="vault.saveKey()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-all shadow-md">Guardar</button>
+            <button onclick="vault.saveKey()" class="ios-btn ios-btn-primary !py-2 !text-xs">Guardar</button>
           </div>
         </div>
       </div>
@@ -356,8 +444,8 @@
 
     <!-- ========== PANEL: TERMINAL ========== -->
     <section id="panel-terminal" class="hidden space-y-6">
-      <div class="glass-card p-0 rounded-2xl shadow-2xl border border-white/40 animate-slide-up h-[70vh] flex flex-col">
-        <div class="p-4 bg-gray-900/80 backdrop-blur-md border-b border-white/10 rounded-t-2xl flex justify-between items-center">
+      <div class="glass-card p-0 shadow-2xl animate-slide-up h-[70vh] flex flex-col">
+        <div class="p-4 backdrop-blur-md border-b border-white/10 rounded-t-3xl flex justify-between items-center" style="background:rgba(10,11,13,0.85);">
           <div class="flex items-center gap-2">
             <div class="w-3 h-3 rounded-full bg-red-500"></div>
             <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
@@ -370,12 +458,12 @@
             <button class="w-6 h-6 rounded-full bg-gray-700 hover:bg-gray-600 text-xs text-gray-300 flex items-center justify-center transition-colors">✕</button>
           </div>
         </div>
-        <div class="flex-1 bg-gray-900 text-green-400 font-mono text-sm p-4 overflow-y-auto font-mono" id="terminalOutput">
+        <div class="flex-1 text-green-400 font-mono text-sm p-4 overflow-y-auto font-mono" style="background:#0a0b0d;" id="terminalOutput">
           <div class="text-blue-400">> AICascade Terminal v1.0.0 — Modo Super Admin</div>
           <div class="text-gray-500">> Tipo 'help' para ver comandos disponibles</div>
           <div class="mt-2 text-gray-500">> $</div>
         </div>
-        <div class="p-4 border-t border-white/10 bg-gray-900/50 backdrop-blur-md rounded-b-2xl">
+        <div class="p-4 border-t border-white/10 backdrop-blur-md rounded-b-3xl" style="background:rgba(10,11,13,0.55);">
           <input type="text" id="terminalInput" placeholder="Ejecutar comando..." class="w-full bg-transparent text-green-400 font-mono text-sm outline-none placeholder-gray-600" autocomplete="off">
         </div>
       </div>
@@ -383,26 +471,26 @@
 
     <!-- ========== PANEL: ATAJOS ========== -->
     <section id="panel-shortcuts" class="hidden space-y-6">
-      <div class="glass-card p-6 rounded-2xl shadow-xl border border-white/40 animate-slide-up">
-        <h2 class="text-lg font-bold text-gray-900 mb-6">Atajos del Sistema</h2>
+      <div class="glass-card p-6 animate-slide-up">
+        <h2 class="text-lg font-bold text-gray-900 tracking-tight mb-6">Atajos del Sistema</h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div class="glass-card p-5 rounded-xl border border-white/30 text-center hover:scale-[1.02] transition-transform cursor-pointer group" onclick="app.openVSCode()">
-            <div class="w-12 h-12 bg-blue-600/20 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-blue-600/30 transition-colors">
-              <svg class="w-6 h-6 text-blue-600 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+          <div class="glass-card p-5 text-center hover:scale-[1.02] transition-transform cursor-pointer group" onclick="app.openVSCode()">
+            <div class="w-12 h-12 rounded-2xl bg-blue-600/15 flex items-center justify-center mx-auto mb-3 group-hover:bg-blue-600/25 transition-colors">
+              <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
             </div>
             <h3 class="font-semibold text-gray-900 mb-1">VS Code</h3>
             <p class="text-xs text-gray-500">Abrir editor de código</p>
           </div>
-          <div class="glass-card p-5 rounded-xl border border-white/30 text-center hover:scale-[1.02] transition-transform cursor-pointer group" onclick="app.openGitHub()">
-            <div class="w-12 h-12 bg-gray-900/20 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-gray-900/30 transition-colors">
-              <svg class="w-6 h-6 text-gray-900 group-hover:text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7.59 0-4.28-4.48-8.28-10.05-8.28A11.97 11.97 0 002 9c0 5.59 4.56 10.52 10 10.94M15 15l-3 3m0 0l-3 3m3-3v-3m0 0l3 3m-3-3V3"></path></svg>
+          <div class="glass-card p-5 text-center hover:scale-[1.02] transition-transform cursor-pointer group" onclick="app.openGitHub()">
+            <div class="w-12 h-12 rounded-2xl bg-gray-900/10 flex items-center justify-center mx-auto mb-3 group-hover:bg-gray-900/20 transition-colors">
+              <svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7.59 0-4.28-4.48-8.28-10.05-8.28A11.97 11.97 0 002 9c0 5.59 4.56 10.52 10 10.94M15 15l-3 3m0 0l-3 3m3-3v-3m0 0l3 3m-3-3V3"></path></svg>
             </div>
             <h3 class="font-semibold text-gray-900 mb-1">GitHub</h3>
             <p class="text-xs text-gray-500">Repositorios del proyecto</p>
           </div>
-          <div class="glass-card p-5 rounded-xl border border-white/30 text-center hover:scale-[1.02] transition-transform cursor-pointer group" onclick="app.openCascadeFolder()">
-            <div class="w-12 h-12 bg-purple-600/20 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-purple-600/30 transition-colors">
-              <svg class="w-6 h-6 text-purple-600 group-hover:text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
+          <div class="glass-card p-5 text-center hover:scale-[1.02] transition-transform cursor-pointer group" onclick="app.openCascadeFolder()">
+            <div class="w-12 h-12 rounded-2xl bg-purple-600/15 flex items-center justify-center mx-auto mb-3 group-hover:bg-purple-600/25 transition-colors">
+              <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
             </div>
             <h3 class="font-semibold text-gray-900 mb-1">Carpeta Proyecto</h3>
             <p class="text-xs text-gray-500">AICascadeWidget en documentos</p>
@@ -411,7 +499,7 @@
       </div>
     </section>
 
-    <!-- Notificación flotante -->
+    <!-- Notificación flotante (iOS) -->
     <div id="toast" class="fixed bottom-6 right-6 glass-card px-4 py-3 rounded-xl shadow-xl border border-white/40 transform translate-y-20 opacity-0 transition-all duration-300 z-50">
       <div class="flex items-start gap-3">
         <div class="w-2 h-2 rounded-full bg-green-400 mt-1"></div>
@@ -432,12 +520,175 @@
   <script src="js/settings.js?v=20261019b"></script>
   <script src="js/app.js?v=20261019b"></script>
   <script>
+    // ============================================================
+    // LIQUID GLASS ENGINE v2 (aditivo, sin tocar lógica):
+    // A) Refracción real vía SVG filter (soporte Chromium/Safari)
+    // B) Overlay .lg-shine: halo radial + borde cónico siguiendo cursor
+    // C) Tilt magnético con física spring (solo hover, rAF-throttled)
+    // D) Pulso lumínico al conmutar el modelo activo de la cascada
+    // ============================================================
+    (function () {
+      // --- A) Refracción (feature-detect) ---
+      try {
+        if (CSS.supports && CSS.supports('backdrop-filter', 'url(#glassDistort) blur(1px)')) {
+          document.documentElement.classList.add('fx-refract');
+        }
+      } catch (e) {}
+
+      // Filtro SVG: displacement map del backdrop (CodePen refraction pattern)
+      var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('width', '0'); svg.setAttribute('height', '0');
+      svg.setAttribute('style', 'position:absolute'); svg.setAttribute('aria-hidden', 'true');
+      svg.innerHTML = '<filter id="glassDistort" x="0%" y="0%" width="100%" height="100%">'
+        + '<feTurbulence type="fractalNoise" baseFrequency="0.008 0.008" numOctaves="2" seed="92" result="noise"/>'
+        + '<feGaussianBlur in="noise" stdDeviation="2" result="soft"/>'
+        + '<feDisplacementMap in="SourceGraphic" in2="soft" scale="70" xChannelSelector="R" yChannelSelector="G"/>'
+        + '</filter>';
+      document.body.appendChild(svg);
+
+      var canHover = window.matchMedia && window.matchMedia('(hover: hover) and (prefers-reduced-motion: no-preference)').matches;
+
+      // --- B/C) Overlays por widget + tilt magnético ---
+      function radiusOf(el) {
+        return parseFloat(getComputedStyle(el).borderTopLeftRadius) || 28;
+      }
+      function initWidget(el) {
+        if (el._lgInit) return;
+        el._lgInit = true;
+        var ov = document.createElement('div');
+        ov.className = 'lg-shine';
+        el.appendChild(ov);
+
+        if (!canHover) return;
+
+        var ctx = { tg: 270 }; // ángulo suavizado
+        function onMove(e) {
+          if (el._raf) return;
+          el._raf = requestAnimationFrame(function () {
+            el._raf = 0;
+            var r = el.getBoundingClientRect();
+            var x = e.clientX - r.left, y = e.clientY - r.top;
+            var px = (x / r.width) * 100, py = (y / r.height) * 100;
+            ov.style.setProperty('--mx', px + '%');
+            ov.style.setProperty('--my', py + '%');
+            // ángulo del cursor respecto al centro (para borde cónico)
+            var ang = Math.atan2(y - r.height / 2, x - r.width / 2) * 180 / Math.PI;
+            ctx.tg = (ang + 90 + 360) % 360;
+            ov.style.setProperty('--shine-angle', ctx.tg + 'deg');
+            el.style.setProperty('--mx', px + '%');
+            // tilt: desviación normalizada hacia el cursor
+            var nx = (x / r.width - 0.5) * 2, ny = (y / r.height - 0.5) * 2;
+            el.style.setProperty('--ry', (nx * 2.0).toFixed(2) + 'deg');
+            el.style.setProperty('--rx', (-ny * 2.0).toFixed(2) + 'deg');
+          });
+        }
+        function onEnter() { el.style.setProperty('--sc', '1.006'); }
+        function onLeave() {
+          cancelAnimationFrame(el._raf || 0); el._raf = 0;
+          ov.style.setProperty('--shine-angle', '0deg');
+          el.style.setProperty('--rx', '0deg');
+          el.style.setProperty('--ry', '0deg');
+          el.style.setProperty('--sc', '1');
+        }
+        el.addEventListener('pointermove', onMove, { passive: true });
+        el.addEventListener('pointerenter', onEnter);
+        el.addEventListener('pointerleave', onLeave, { once: false });
+      }
+
+      document.querySelectorAll('main .glass-card').forEach(initWidget);
+      // Cartas generadas por JS (vault/providers) al aparecer
+      if (window.MutationObserver) {
+        new MutationObserver(function () {
+          document.querySelectorAll('main .glass-card').forEach(initWidget);
+        }).observe(document.body, { childList: true, subtree: true });
+      }
+
+      // --- D) Pulso lumínico al conmutar de modelo ---
+      var hero = null, lastModel = null;
+      function wirePulse() {
+        var m = document.getElementById('activeModel');
+        var ring = document.getElementById('iosRing');
+        if (!m || !hero) {
+          var panel = document.getElementById('panel-dashboard');
+          hero = panel ? panel.querySelector('.glass-card') : null;
+        }
+        if (m && hero && window.MutationObserver) {
+          new MutationObserver(function () {
+            var v = m.textContent.trim();
+            if (v && v !== lastModel) {
+              lastModel = v;
+              hero.classList.remove('fx-pulse'); void hero.offsetWidth;
+              hero.classList.add('fx-pulse');
+              if (ring) { ring.classList.remove('fx-ring-pulse'); void ring.offsetWidth; ring.classList.add('fx-ring-pulse'); }
+            }
+          }).observe(m, { childList: true, characterData: true, subtree: true });
+        }
+      }
+      document.addEventListener('DOMContentLoaded', wirePulse);
+      setTimeout(wirePulse, 200);
+    })();
+  </script>
+  <script>
     // Registrar service worker solo en http(s), no en file://
     if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('sw.js').catch(() => {});
       });
     }
+  </script>
+  <script>
+    // ============================================================
+    // UI GLUE (aditivo, sin tocar lógica existente):
+    // 1) Dynamic Island: espejo de reloj + estado del backend
+    // 2) Gauge circular: sincroniza con tokenBarTotal/remainingTokens
+    // ============================================================
+    (function () {
+      function pad(n) { return String(n).padStart(2, '0'); }
+      function tick() {
+        const isl = document.getElementById('dynamicIsland');
+        if (!isl) return;
+        const now = new Date();
+        isl.querySelector('.di-time').textContent = pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
+      }
+      tick(); setInterval(tick, 1000);
+
+      // Estado del backend -> Dynamic Island
+      const bs = document.getElementById('backendStatus');
+      if (bs && window.MutationObserver) {
+        const island = document.getElementById('dynamicIsland');
+        const apply = () => {
+          const html = bs.innerHTML || '';
+          if (island) island.setAttribute('data-state', html.indexOf('bg-green-500') !== -1 ? 'online' : 'offline');
+        };
+        new MutationObserver(apply).observe(bs, { childList: true, subtree: true, characterData: true });
+        apply();
+      }
+
+      // Gauge circular + tono de color según % de cuota usada
+      function paint() {
+        const bar = document.getElementById('tokenBarTotal');
+        const ring = document.getElementById('iosRing');
+        const val = document.getElementById('iosRingVal');
+        if (!bar || !ring || !val) return;
+        const pct = Math.max(0, Math.min(100, parseFloat(bar.style.width) || 0));
+        val.textContent = Math.round(pct) + '%';
+        ring.style.setProperty('--pct', pct);
+        ring.setAttribute('data-tone', pct >= 90 ? 'crit' : pct >= 60 ? 'warn' : 'ok');
+      }
+      // Barras cambian via style.width y className -> observar ambos
+      function hook(id, fn) {
+        const el = document.getElementById(id);
+        if (el && window.MutationObserver) {
+          new MutationObserver(fn).observe(el, { attributes: true, attributeFilter: ['style', 'class'] });
+          new MutationObserver(fn).observe(el, { childList: true, characterData: false });
+        }
+      }
+      document.addEventListener('DOMContentLoaded', paint);
+      setTimeout(paint, 300);
+      setInterval(paint, 800);
+      hook('tokenBarTotal', paint);
+      hook('remainingTokens', paint);
+    })();
   </script>
 
 </body>

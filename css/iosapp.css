@@ -1,0 +1,249 @@
+/* ==========================================================================
+   AICascade — iOS APP-LIKE LAYER v3 ("Designed for iOS" en tu PC)
+   Convierte el HUD en una app nativa iOS: rail flotante iPadOS, toolbar
+   sticky, listas con hairline+chevron, wallpaper mesh y escala tipográfica
+   del sistema. Solo visual: no toca IDs/JS/lógica.
+   ========================================================================== */
+
+/* ---------- R2. Wallpaper tipo iOS 18 (mesh, sin foto web) ---------- */
+#iosWallpaper {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(1200px 800px at 12% -12%, rgba(191,219,254,0.55), transparent 58%),
+    radial-gradient(1000px 700px at 88% 4%, rgba(147,197,253,0.42), transparent 60%),
+    radial-gradient(900px 700px at 58% 108%, rgba(216,180,254,0.35), transparent 62%),
+    radial-gradient(800px 600px at 94% 92%, rgba(94,234,212,0.30), transparent 58%),
+    linear-gradient(165deg, #f4f7fd 0%, #eef2fa 45%, #eaf0fb 100%);
+}
+[data-theme="night"] #iosWallpaper {
+  background:
+    radial-gradient(1200px 800px at 10% -10%, rgba(30,58,138,0.55), transparent 58%),
+    radial-gradient(1000px 700px at 88% 6%, rgba(76,29,149,0.42), transparent 60%),
+    radial-gradient(900px 700px at 55% 108%, rgba(8,74,110,0.40), transparent 64%),
+    radial-gradient(700px 500px at 95% 90%, rgba(6,95,96,0.30), transparent 58%),
+    linear-gradient(170deg, #06070d 0%, #0a0f1e 55%, #0d1526 100%);
+}
+
+/* ---------- R10. Escala tipográfica iOS ---------- */
+main { font-size: 15px; }
+main h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.03em; }
+main p  { letter-spacing: -0.011em; }
+.ios-label {
+  font-size: 11px !important; font-weight: 600 !important;
+  text-transform: uppercase; letter-spacing: 0.08em !important;
+}
+
+/* ---------- R20. Rail flotante estilo iPadOS (>=768px) ---------- */
+@media (min-width: 769px) {
+  aside#sidebar {
+    top: 14px !important; bottom: 14px !important; left: 14px !important;
+    height: auto !important;
+    width: 236px !important;
+    border-radius: 26px !important;
+    border: 1px solid var(--ios-glass-border) !important;
+    background: var(--ios-glass-bg) !important;
+    backdrop-filter: blur(28px) saturate(200%) !important;
+    -webkit-backdrop-filter: blur(28px) saturate(200%) !important;
+    box-shadow: 0 2px 6px rgba(15,23,42,0.05), 0 18px 44px rgba(15,23,42,0.14), var(--ios-bezel-inset) !important;
+    overflow: hidden;
+  }
+  [data-theme="night"] aside#sidebar {
+    background: rgba(13,16,22,0.78) !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4), 0 22px 52px rgba(0,0,0,0.5), var(--ios-bezel-inset) !important;
+  }
+  aside#sidebar > div:first-child {
+    background: transparent !important;
+    border-bottom: 1px solid var(--ios-glass-border) !important;
+  }
+  /* Navegación SF-style: idle gris, activo PÍLDORA BLANCA con acento azul */
+  .nav-item {
+    border-radius: 14px !important;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: var(--ios-txt-1) !important;
+    transition: background .25s cubic-bezier(0.16,1,0.3,1), transform .25s;
+  }
+  .nav-item svg { color: var(--ios-txt-2) !important; transition: color .25s, transform .25s; }
+  .nav-item span { color: var(--ios-txt-1) !important; font-weight: 600 !important; font-size: 13.5px !important; }
+  .nav-item:hover {
+    background: rgba(255,255,255,0.55) !important;
+  }
+  .nav-item:hover svg { color: var(--ios-txt-1) !important; }
+  .nav-item:active { transform: scale(0.97); }
+
+  /* ACTIVO (JS pinta bg-blue-50/50 text-blue-700 border-blue-100/50) */
+  .nav-item.bg-blue-50\/50 {
+    background: rgba(255,255,255,0.92) !important;
+    box-shadow: 0 1px 2px rgba(15,23,42,0.06), 0 6px 16px rgba(15,23,42,0.08), inset 0 1px 0 rgba(255,255,255,1) !important;
+  }
+  [data-theme="night"] .nav-item.bg-blue-50\/50 {
+    background: rgba(255,255,255,0.14) !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.16) !important;
+  }
+  .nav-item.bg-blue-50\/50 svg { color: var(--ios-accent) !important; }
+  .nav-item.bg-blue-50\/50 span { color: var(--ios-accent) !important; }
+
+  /* margen de contenido ajustado al rail flotante */
+  main { margin-left: 276px !important; padding-left: 28px !important; padding-right: 28px !important; }
+}
+
+/* ---------- R30. Toolbar sticky translúcida (iOS navigationBar) ---------- */
+main > header {
+  position: sticky; top: 8px; z-index: 30;
+  padding: 10px 18px !important;
+  border-radius: 22px !important;
+  background: var(--ios-glass-bg) !important;
+  backdrop-filter: blur(30px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(30px) saturate(200%) !important;
+  border: 1px solid var(--ios-glass-border) !important;
+  box-shadow: 0 2px 6px rgba(15,23,42,0.05), 0 14px 34px rgba(15,23,42,0.10), var(--ios-bezel-inset) !important;
+}
+[data-theme="night"] main > header { background: rgba(13,16,22,0.72) !important; }
+main > header .ios-btn-secondary, main > header .bg-white\/50 { border-radius: 14px !important; }
+
+/* ---------- R40. CONTENIDO: máx ancho + scrollbars invisibles ---------- */
+main > header + * { max-width: 1360px; }
+main section { scroll-margin-top: 90px; }
+/* En cards, lista terminal y tiles: scrollbar overlay invisible */
+.glass-card::-webkit-scrollbar, #activityLog::-webkit-scrollbar,
+#chatLog::-webkit-scrollbar, #terminalOutput::-webkit-scrollbar { width: 0 !important; height: 0 !important; }
+main::-webkit-scrollbar { width: 10px; }
+main::-webkit-scrollbar-thumb { background: rgba(138,148,166,0.28); border-radius: 9999px; border: 3px solid transparent; background-clip: padding-box; }
+
+/* ---------- R50. Listas iOS (rows con chevron, no sub-cards) ---------- */
+/* .model-item (pintado por app.js) => fila de Settings */
+.model-item {
+  background: transparent !important;
+  border: none !important;
+  border-radius: 12px !important;
+  padding: 11px 10px !important;
+  gap: 12px !important;
+  position: relative;
+}
+.model-item + .model-item::before {
+  content: ""; position: absolute; top: 0; left: 34px; right: 0; height: 1px;
+  background: var(--ios-track);
+}
+.model-item.active {
+  background: rgba(10,132,255,0.10) !important;
+  border: none !important;
+}
+[data-theme="night"] .model-item.active { background: rgba(56,189,248,0.12) !important; }
+.model-item:hover { background: rgba(15,23,42,0.045) !important; transform: none !important; }
+[data-theme="night"] .model-item:hover { background: rgba(255,255,255,0.06) !important; }
+
+/* Chevron ">" derecha (iOS row affordance) */
+.model-item::after {
+  content: ""; position: absolute; right: 10px; top: 50%;
+  width: 8px; height: 8px;
+  border-top: 2px solid rgba(138,148,166,0.75);
+  border-right: 2px solid rgba(138,148,166,0.75);
+  transform: translateY(-50%) rotate(45deg);
+  border-radius: 1px;
+}
+.model-item > div:last-child { margin-right: 14px; }
+.model-item .dot { width: 9px; height: 9px; }
+
+/* ---------- R60. Cards más compactas (squircle iOS 24px) ---------- */
+.glass-card { border-radius: 24px !important; }
+.lg-shine { border-radius: inherit; }
+.glass-card.p-6 { padding: 22px !important; }
+
+/* ---------- R70. Botones a escala iOS (radius 14, menos float) ---------- */
+.ios-btn { border-radius: 14px !important; font-size: 14px !important; padding: 11px 20px !important; }
+.ios-btn-primary { box-shadow: 0 4px 14px rgba(10,132,255,0.32), inset 0 1px 0 rgba(255,255,255,0.28) !important; }
+.ios-btn-secondary { box-shadow: none !important; background: rgba(255,255,255,0.62) !important; }
+[data-theme="night"] .ios-btn-secondary { background: rgba(255,255,255,0.10) !important; }
+
+/* Chips tipo píldora de info */
+.ios-chip { border-radius: 9999px !important; padding: 7px 13px !important; background: rgba(255,255,255,0.55) !important; }
+[data-theme="night"] .ios-chip { background: rgba(255,255,255,0.07) !important; }
+
+/* ---------- R80. Widget hero: mucho más "iPhone" ---------- */
+#panel-dashboard > .glass-card:first-child { padding: 24px !important; }
+#panel-dashboard .dynamic-island { box-shadow: 0 12px 32px rgba(0,0,0,0.45) !important; }
+
+/* ---------- R90. Rail: ocultar botón tema texto largo en narrow? mantener ---------- */
+aside#sidebar nav { padding: 10px 10px !important; gap: 4px !important; }
+aside#sidebar nav .nav-item { padding: 12px 14px !important; }
+aside#sidebar nav .nav-item span { letter-spacing: -0.01em; }
+aside#sidebar > div:last-child { padding: 12px !important; }
+
+/* Marca superior del rail con vidrio más denso */
+aside#sidebar > div:first-child .w-9 { border-radius: 11px !important; }
+
+/* ---------- R100. Header buttons redondos con hover brillante ---------- */
+main > header button { transition: transform .25s cubic-bezier(0.16,1,0.3,1), background .25s, box-shadow .25s; }
+main > header button:hover { transform: translateY(-1px); }
+main > header .h-10.w-10 { border-radius: 12px !important; }
+
+/* ---------- R110. Chat: burbujas iMessage ---------- */
+#chatLog > div { max-width: 78%; }
+#chatLog > div.flex.justify-end > div {
+  border-radius: 20px 20px 6px 20px !important;
+  box-shadow: 0 2px 10px rgba(10,132,255,0.25) !important;
+}
+#chatLog > div.flex.justify-start > div {
+  border-radius: 20px 20px 20px 6px !important;
+  background: rgba(255,255,255,0.85) !important;
+  box-shadow: 0 2px 10px rgba(15,23,42,0.08) !important;
+}
+[data-theme="night"] #chatLog > div.flex.justify-start > div { background: rgba(255,255,255,0.10) !important; }
+
+/* ---------- R120. Vault rows estilo lista iOS ---------- */
+#vaultList > .glass-card { border-radius: 20px !important; padding: 14px 16px !important; }
+#vaultList > .glass-card:hover { transform: none !important; }
+
+/* ---------- R130. Toast como notificación iOS (banner superior) ---------- */
+#toast {
+  top: 14px !important; bottom: auto !important; left: 50% !important; right: auto !important;
+  transform: translate(-50%, -80px) scale(0.92) !important;
+  border-radius: 20px !important;
+  padding: 12px 20px !important;
+  min-width: 300px; max-width: 92vw;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.28), var(--ios-bezel-inset) !important;
+}
+#toast.translate-y-20 { transform: translate(-50%, -80px) scale(0.92) !important; }
+#toast.translate-y-20.opacity-0 { opacity: 0 !important; }
+/* estado visible (JS solo remueve las clases, no agrega nada) */
+#toast:not(.translate-y-20) { opacity: 1 !important; transform: translate(-50%, 0) scale(1) !important; }
+#toast .w-2.h-2 { width: 10px !important; height: 10px !important; margin-top: 2px !important; }
+
+/* ---------- R140. Proveedores grid = 2 columnas widget iOS ---------- */
+#panel-providers .glass-card .grid { gap: 14px !important; }
+/* sub-cards glColor del render JS ya heredan glass-card (rounded 24) */
+
+/* ---------- R150. Métricas internas: hairline separadores ---------- */
+#panel-dashboard .space-y-2\.5 > div {
+  border-radius: 14px !important;
+  background: rgba(255,255,255,0.45) !important;
+}
+[data-theme="night"] #panel-dashboard .space-y-2\.5 > div { background: rgba(255,255,255,0.06) !important; }
+
+/* ---------- R160. Dinámica: hairline entre secciones de panel ---------- */
+main section > .glass-card + .glass-card { margin-top: 18px; }
+
+/* ---------- R170. Móvil iPhone 16 Pro: pulir bottom tab bar de iphone.css ---------- */
+@media (max-width: 768px) {
+  main > header {
+    top: 6px; padding: 10px 14px !important; border-radius: 18px !important;
+  }
+  aside#sidebar nav .nav-item {
+    border-radius: 14px !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+  aside#sidebar nav .nav-item.bg-blue-50\/50 { background: rgba(10,132,255,0.12) !important; }
+  aside#sidebar nav .nav-item.bg-blue-50\/50 svg { color: var(--ios-accent) !important; }
+  #iosWallpaper { background-position: center; }
+  .glass-card { border-radius: 20px !important; }
+  #chatLog { max-height: 46vh !important; }
+}
+
+/* ---------- R180. Focus rings iOS azules ---------- */
+*:focus-visible {
+  outline: 2.5px solid rgba(10,132,255,0.55) !important;
+  outline-offset: 2px;
+  border-radius: 12px;
+}
