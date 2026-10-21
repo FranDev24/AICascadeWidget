@@ -18,7 +18,7 @@
   <link rel="icon" type="image/png" sizes="16x16" href="icons/icon-16.png">
   <!-- Open Graph para WhatsApp -->
   <meta property="og:type" content="website">
-  <meta property="og:title" content="AICascade Widget â€” Gestor de Cascada IA">
+  <meta property="og:title" content="AICascade Widget — Gestor de Cascada IA">
   <meta property="og:description" content="HUD Liquid Glass iOS 18 Pro: failover automatico entre 9 modelos IA, vault de API keys y terminal super admin. Instalable en iPhone.">
   <meta property="og:image" content="icons/og-cover.png">
   <meta name="twitter:card" content="summary_large_image">
@@ -37,6 +37,7 @@
   <link rel="stylesheet" href="css/18pro-sphere.css?v=s1">
   <link rel="stylesheet" href="css/uiverse-theme-toggle.css?v=tt1">
   <link rel="stylesheet" href="css/ios-18pro-liquid.css?v=liq2">
+  <link rel="stylesheet" href="css/gemini-chat.css?v=gc1">
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -88,7 +89,7 @@
 </head>
 <body class="antialiased h-screen w-screen overflow-hidden transition-colors duration-500 font-sans selection:bg-blue-500 selection:text-white" style="background: var(--p18-day-base-a, #F2F4F8); color: var(--p18-title-day, #1A1D24);">
 
-  <!-- iPhone Status Bar (notch + hora + seÃ±al + baterÃ­a) â€” Paleta iPhone 18 Pro -->
+  <!-- iPhone Status Bar (notch + hora + señal + batería) — Paleta iPhone 18 Pro -->
   <div id="statusBar" class="fixed top-0 left-0 right-0 h-10 z-[60] pointer-events-none lg:hidden" style="color: var(--p18-title-day, #1A1D24);">
     <div class="flex items-center justify-between px-4 py-1 text-[10px] font-medium tracking-tight">
       <div class="flex items-center gap-1">
@@ -112,7 +113,7 @@
   <div id="iosWallpaper" aria-hidden="true"></div>
 
 
-  <!-- ========== SIDEBAR (NAVEGACIÃ“N iOS â€” solo desktop) ========== -->
+  <!-- ========== SIDEBAR (NAVEGACIÍ“N iOS — solo desktop) ========== -->
   <aside id="sidebar" class="fixed left-0 top-0 h-full w-64 bg-white/10 backdrop-blur-2xl border-r border-white/20 z-40 transition-all duration-300 flex flex-col overflow-y-auto hidden lg:block" style="background: var(--p18-glass-day, rgba(255,255,255,0.68)); border-color: var(--p18-bezel-day, rgba(255,255,255,0.95));">
     <div class="flex items-center justify-between h-16 border-b border-white/20 bg-white/5 px-4" style="border-color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.35);">
       <div class="flex items-center gap-3">
@@ -177,20 +178,20 @@
         </div>
 
         <button onclick="app.openPalette()" data-tip="Command Palette Â· Ctrl+K" title="Command palette (Ctrl+K)" class="hidden sm:flex items-center gap-2 text-xs font-medium text-gray-500 px-3 py-1.5 rounded-full bg-white/50 border border-white/50 hover:bg-white/80 transition-all duration-300">
-          âŒ˜K <span class="hidden lg:inline">Comandosâ€¦</span>
+          <span class="font-mono">Ctrl+K</span> <span class="hidden lg:inline">Comandos…</span>
         </button>
-        <button onclick="app.openSettings()" data-tip="Ajustes" title="Ajustes" class="hidden sm:flex items-center justify-center w-8 h-8 rounded-full bg-white/50 border border-white/50 hover:bg-white/80 transition-all duration-300">âš™ï¸</button>
+        <button onclick="app.openSettings()" data-tip="Ajustes" title="Ajustes" class="hidden sm:flex items-center justify-center w-8 h-8 rounded-full bg-white/50 border border-white/50 hover:bg-white/80 transition-all duration-300"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.08a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.08a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
 
-        <!-- UV-06 Â· Interruptor esfÃ©rico cristal 3D (UIverse: Plata â‡„ Obsidiana) -->
+        <!-- UV-06 — Interruptor esférico cristal 3D (UIverse: Plata — Obsidiana) -->
         <div class="theme-toggle-container">
           <div class="toggle">
             <input type="checkbox" id="themeCheckbox" onchange="toggleTheme()">
             <span class="button"></span>
-            <span class="label" id="themeIconLabel">â˜€ï¸</span>
+            <span class="label" id="themeIconLabel">☀️</span>
           </div>
         </div>
         <div id="backendStatus" class="hidden sm:flex items-center gap-2 text-xs font-medium text-gray-500 px-3 py-1.5 rounded-full bg-white/50 border border-white/50">
-          <span class="w-2 h-2 rounded-full bg-gray-400"></span><span>Backend â€¦</span>
+          <span class="w-2 h-2 rounded-full bg-gray-400"></span><span>Backend ”¦</span>
         </div>
         <div class="h-10 w-10 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold shadow-lg shadow-blue-500/30">AC</div>
         <span class="hidden sm:block text-right">
@@ -203,7 +204,7 @@
     <!-- ========== PANEL: DASHBOARD (GRID iOS DE WIDGETS) ========== -->
     <section id="panel-dashboard" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
 
-      <!-- WIDGET HERO: Estado de la cascada + Gauge circular â€” UIverse beam-card (borde luz rotativo) -->
+      <!-- WIDGET HERO: Estado de la cascada + Gauge circular — UIverse beam-card (borde luz rotativo) -->
       <div class="glass-card p-6 md:col-span-2 lg:col-span-3 ios-hero-glow animate-slide-up beam-card">
         <div class="relative z-[3] flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div class="min-w-0">
@@ -216,7 +217,7 @@
             <div class="flex flex-wrap items-center gap-2 mt-4">
               <button onclick="cascade.runFailover()" class="ios-btn ios-btn-primary uv-btn">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                Forzar ConmutaciÃ³n
+                Forzar Conmutación
               </button>
               <button onclick="app.switchPanel('providers')" class="ios-btn ios-btn-secondary uv-btn">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.586m13.48 2.48a12 12 0 01-.348 1.574L20 17l-.586-1.586a6 6 0 10-8.486-8.486L12.414 3l1.586 1.586a6 6 0 100 8.486l-1.586 1.586z"></path></svg>
@@ -249,7 +250,7 @@
           </div>
           <span class="text-[10px] font-semibold uppercase tracking-[0.12em] text-gray-400">SALUD</span>
         </div>
-        <p class="text-lg font-bold text-gray-900 tracking-tight" id="statusText">Ã“ptimo</p>
+        <p class="text-lg font-bold text-gray-900 tracking-tight" id="statusText">Í“ptimo</p>
         <p class="text-xs text-gray-500 mt-1" id="statusHint">Cascada operativa</p>
         <div class="flex flex-wrap gap-2 mt-4">
           <span class="ios-chip">Conmutaciones <b class="ios-num" id="switchCount">0</b></span>
@@ -295,14 +296,14 @@
         </div>
       </div>
 
-      <!-- WIDGET: MÃ©tricas reales -->
+      <!-- WIDGET: Métricas reales -->
       <div class="glass-card p-6 animate-slide-up">
         <div class="flex items-center justify-between mb-4">
           <div class="flex items-center gap-3">
             <div class="ios-tile" style="background:linear-gradient(160deg,rgba(94,92,230,0.16),rgba(94,92,230,0.07));">
               <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
             </div>
-            <h3 class="text-sm font-semibold text-gray-900 tracking-tight">MÃ©tricas Reales</h3>
+            <h3 class="text-sm font-semibold text-gray-900 tracking-tight">Métricas Reales</h3>
           </div>
           <button onclick="cascade.resetUsage(); app.render();" title="Reiniciar contadores" class="text-[11px] text-gray-400 hover:text-gray-700 transition-colors ios-num">â†º reset</button>
         </div>
@@ -322,7 +323,7 @@
         </div>
       </div>
 
-      <!-- WIDGET: Nivel 1 â€” Ultra -->
+      <!-- WIDGET: Nivel 1 — Ultra -->
       <div class="glass-card p-5 model-tier tier-1 relative overflow-hidden animate-slide-up">
         <div class="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-blue-500 to-purple-600 opacity-25"></div>
         <div class="flex items-center justify-between mb-3">
@@ -331,13 +332,13 @@
           </div>
           <span class="di-dot" style="background:var(--ios-accent);box-shadow:0 0 8px rgba(10,132,255,.8);"></span>
         </div>
-        <h3 class="text-[10px] font-bold text-blue-600 uppercase tracking-[0.14em] mb-2">Nivel 1 â€” Ultra</h3>
+        <h3 class="text-[10px] font-bold text-blue-600 uppercase tracking-[0.14em] mb-2">Nivel 1 — Ultra</h3>
         <ul class="space-y-2 text-sm text-gray-600" id="tier1Models">
           <!-- Se llena por JS -->
         </ul>
       </div>
 
-      <!-- WIDGET: Nivel 2 â€” Mid -->
+      <!-- WIDGET: Nivel 2 — Mid -->
       <div class="glass-card p-5 model-tier tier-2 relative overflow-hidden animate-slide-up">
         <div class="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-amber-400 to-orange-500 opacity-25"></div>
         <div class="flex items-center justify-between mb-3">
@@ -346,11 +347,11 @@
           </div>
           <span class="di-dot" style="background:var(--ios-amber);box-shadow:0 0 8px rgba(255,159,10,.8);"></span>
         </div>
-        <h3 class="text-[10px] font-bold text-amber-600 uppercase tracking-[0.14em] mb-2">Nivel 2 â€” Mid</h3>
+        <h3 class="text-[10px] font-bold text-amber-600 uppercase tracking-[0.14em] mb-2">Nivel 2 — Mid</h3>
         <ul class="space-y-2 text-sm text-gray-600" id="tier2Models"></ul>
       </div>
 
-      <!-- WIDGET: Nivel 3 â€” Light -->
+      <!-- WIDGET: Nivel 3 — Light -->
       <div class="glass-card p-5 model-tier tier-3 relative overflow-hidden animate-slide-up">
         <div class="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-green-400 to-emerald-500 opacity-25"></div>
         <div class="flex items-center justify-between mb-3">
@@ -359,7 +360,7 @@
           </div>
           <span class="di-dot" style="background:var(--ios-green);box-shadow:0 0 8px rgba(48,209,88,.8);"></span>
         </div>
-        <h3 class="text-[10px] font-bold text-green-600 uppercase tracking-[0.14em] mb-2">Nivel 3 â€” Light</h3>
+        <h3 class="text-[10px] font-bold text-green-600 uppercase tracking-[0.14em] mb-2">Nivel 3 — Light</h3>
         <ul class="space-y-2 text-sm text-gray-600" id="tier3Models"></ul>
       </div>
 
@@ -385,27 +386,90 @@
     <!-- ========== PANEL: CHAT IA (Backend con failover) ========== -->
     <section id="panel-chat" class="hidden space-y-6">
       <div class="glass-card p-6 animate-slide-up">
-        <div class="flex items-center justify-between mb-4 gap-3">
+        <div class="flex items-center justify-between px-4 pt-4 pb-2 gap-4 border-b border-white/10 bg-black/20 backdrop-blur-sm">
           <div class="flex items-center gap-3">
-            <div class="ios-tile" style="background:linear-gradient(160deg,rgba(94,92,230,0.18),rgba(94,92,230,0.08));">
-              <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
             </div>
-            <div>
-              <h2 class="text-lg font-bold text-gray-900 tracking-tight">Chat IA â€” Cascada con Failover</h2>
-              <p class="text-gray-500 text-xs">Backend FastAPI Â· OpenAI â†’ DeepSeek â†’ Ollama â†’ simulado</p>
+            <div class="flex flex-col">
+              <h2 class="text-base font-semibold text-gray-900 tracking-tight leading-none">Chat IA</h2>
+              <p class="text-xs text-gray-500 leading-none">Cascada con failover automático · Backend FastAPI</p>
             </div>
           </div>
-          <span id="chatMode" class="text-xs font-medium px-2.5 py-1 rounded-full bg-gray-100 text-gray-600">modo: local</span>
+          <div class="flex items-center gap-2 bg-white/5 rounded-lg border border-white/10 px-2 py-1.5 backdrop-blur-sm hover:bg-white/10 transition-colors" id="modelSelector" onclick="app.toggleModelMenu()">
+            <span id="modelLabel" class="text-xs font-medium text-gray-300">Cascade Auto</span>
+            <svg class="w-3 h-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+          </div>
+          <span id="chatBackendBadge" class="text-xs font-medium px-2 py-1 rounded-full bg-gray-100/50 border border-gray-200/50 text-gray-600">● Backend</span>
         </div>
-        <div id="chatLog" class="h-64 overflow-y-auto space-y-3 p-4 rounded-2xl mb-4 border" style="background:var(--ios-pill);border-color:var(--ios-glass-border);"></div>
-        <div class="flex gap-2">
-          <div class="uv-seg">
-            <button class="is-on" title="Modo Local">Local</button>
-            <button title="Modo Cascada">Cascada</button>
+
+        <!-- Menú de modelos (desplegable) -->
+        <div id="modelMenu" class="hidden absolute right-4 mt-1 w-56 bg-white/90 border border-gray-200 rounded-xl shadow-xl shadow-gray-200/50 backdrop-blur-md z-50">
+          <div class="px-4 py-2 border-b border-gray-100">
+            <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Seleccionar modelo</p>
           </div>
-          <input id="chatInput" type="text" placeholder="Escribe tu mensaje y pulsa Enterâ€¦"
-            class="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 bg-white/80 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50">
-          <button onclick="app.sendChat()" class="ios-btn ios-btn-primary uv-btn">Enviar</button>
+          <div id="modelList" class="py-1">
+            <!-- Se llena por JS desde /api/cascade/models -->
+          </div>
+        </div>
+
+        <!-- Área de mensajes tipo Gemini -->
+        <div id="chatLog" class="flex-1 overflow-y-auto p-6 space-y-4 bg-[#0a0a0f] scroll-smooth" role="log" aria-label="Conversación">
+          <!-- Mensaje de bienvenida tipo Gemini -->
+          <div class="flex flex-col items-start max-w-[70%] animate-fade-in-up">
+            <div class="rounded-2xl rounded-tr-none bg-gray-800 p-4 text-sm text-gray-300 leading-relaxed">
+              ¡Hola! Soy tu asistente de AICascade con failover automático.<br><br>
+              Puedo ayudarte con preguntas, código, análisis y más. Usa <span class="text-indigo-400 font-mono">@</span> para ver conectores y habilidades disponibles.
+            </div>
+            <span class="text-[10px] text-gray-600 mt-1">Cascade Auto · Ahora</span>
+          </div>
+        </div>
+
+        <!-- Indicador de escritura (oculto por defecto) -->
+        <div id="typingIndicator" class="hidden px-6 py-2">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-xs text-white">A</div>
+            <div class="flex flex-col items-start">
+              <div class="text-xs font-medium text-gray-900">Asistente</div>
+              <div class="flex gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce"></span>
+                <span class="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style="animation-delay:0.1s"></span>
+                <span class="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style="animation-delay:0.2s"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Campo de entrada tipo Gemini -->
+        <div class="px-4 pb-6 pt-2 border-t border-white/10 bg-[#0a0a0f] backdrop-blur-md">
+          <div class="relative flex items-end gap-2">
+            <!-- Botón de sugerencias @ -->
+            <button onclick="app.toggleSuggestions()" id="atSuggestionBtn" class="text-gray-400 hover:text-indigo-500 transition-colors p-2 rounded-lg hover:bg-white/5">
+              <span class="text-lg font-bold">@</span>
+            </button>
+            <!-- Campo de texto -->
+            <input id="chatInput" type="text" placeholder="Escribe @ para conectores o habilidades…"
+              class="flex-1 px-4 py-3 rounded-2xl border border-gray-700 bg-white/5 text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-transparent transition-all placeholder-gray-500 text-sm"
+              autocomplete="off"
+              spellcheck="false">
+            <!-- Botón de voz -->
+            <button id="voiceBtn" onclick="app.toggleVoiceInput()" class="text-gray-400 hover:text-green-500 transition-colors p-2 rounded-lg hover:bg-white/5 hidden" title="Entrada por voz">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.5 14a9 9 0 11-2 0h4.919a1 1 0 011 1v1a1 1 0 01-1 1h-4.919a1 1 0 01-1-1v-1a1 1 0 011-1zM12 18a.6.6 0 000-1.2v.6z"></path></svg>
+            </button>
+            <!-- Botón enviar -->
+            <button onclick="app.sendChat()" id="sendBtn" class="bg-indigo-600 hover:bg-indigo-500 disabled:bg-gray-600 disabled:opacity-50 text-white px-5 py-3 rounded-2xl font-medium transition-all disabled:cursor-not-allowed shadow-lg shadow-indigo-500/20">
+              Enviar
+            </button>
+          </div>
+          <!-- Sugerencias @ (ocultas por defecto) -->
+          <div id="suggestionsPanel" class="hidden absolute bottom-full left-0 right-0 mt-1 w-full bg-white/95 border border-gray-200 rounded-xl shadow-2xl shadow-gray-200/50 backdrop-blur-md z-50 mb-2">
+            <div class="px-4 py-2 border-b border-gray-100">
+              <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Conectores y habilidades</p>
+            </div>
+            <div class="grid grid-cols-2 gap-2 p-3" id="suggestionsList">
+              <!-- Se llena por JS -->
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -436,11 +500,11 @@
             </div>
             <div>
               <h2 class="text-lg font-bold text-gray-900 tracking-tight">Vault de Credenciales</h2>
-              <p class="text-gray-500 text-xs">Claves cifradas Â· sync automÃ¡tico al backend</p>
+              <p class="text-gray-500 text-xs">Claves cifradas Â· sync automático al backend</p>
             </div>
           </div>
           <div class="flex flex-wrap items-center gap-2">
-            <input id="vaultSearch" type="text" placeholder="Buscar proveedorâ€¦" oninput="vault.search(this.value)"
+            <input id="vaultSearch" type="text" placeholder="Buscar proveedor”¦" oninput="vault.search(this.value)"
               class="px-3 py-2 rounded-lg border border-gray-200 bg-white/80 text-sm w-44 focus:outline-none focus:ring-2 focus:ring-blue-500/50">
             <button onclick="vault.exportKeys()" title="Exportar backup JSON" class="ios-btn ios-btn-secondary uv-btn !px-3.5 !py-2 !text-xs">â¤“ Export</button>
             <label class="ios-btn ios-btn-secondary uv-btn !px-3.5 !py-2 !text-xs cursor-pointer">â¤’ Import
@@ -486,7 +550,7 @@
             <div class="w-3 h-3 rounded-full bg-red-500"></div>
             <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
             <div class="w-3 h-3 rounded-full bg-green-500"></div>
-            <span class="ml-3 text-xs font-mono text-gray-400">bash â€” super-admin</span>
+            <span class="ml-3 text-xs font-mono text-gray-400">bash — super-admin</span>
           </div>
           <div class="flex gap-1">
             <button class="w-6 h-6 rounded-full bg-gray-700 hover:bg-gray-600 text-xs text-gray-300 flex items-center justify-center transition-colors">_</button>
@@ -495,7 +559,7 @@
           </div>
         </div>
         <div class="flex-1 text-green-400 font-mono text-sm p-4 overflow-y-auto font-mono" style="background:#0a0b0d;" id="terminalOutput">
-          <div class="text-blue-400">> AICascade Terminal v1.0.0 â€” Modo Super Admin</div>
+          <div class="text-blue-400">> AICascade Terminal v1.0.0 — Modo Super Admin</div>
           <div class="text-gray-500">> Tipo 'help' para ver comandos disponibles</div>
           <div class="mt-2 text-gray-500">> $</div>
         </div>
@@ -515,7 +579,7 @@
               <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
             </div>
             <h3 class="font-semibold text-gray-900 mb-1">VS Code</h3>
-            <p class="text-xs text-gray-500">Abrir editor de cÃ³digo</p>
+            <p class="text-xs text-gray-500">Abrir editor de código</p>
           </div>
           <div class="glass-card p-5 text-center hover:scale-[1.02] transition-transform cursor-pointer group" onclick="app.openGitHub()">
             <div class="w-12 h-12 rounded-2xl bg-gray-900/10 flex items-center justify-center mx-auto mb-3 group-hover:bg-gray-900/20 transition-colors">
@@ -535,20 +599,20 @@
       </div>
     </section>
 
-    <!-- NotificaciÃ³n flotante (iOS) -->
+    <!-- Notificación flotante (iOS) -->
     <div id="toast" class="fixed bottom-6 right-6 glass-card px-4 py-3 rounded-xl shadow-xl border border-white/40 transform translate-y-20 opacity-0 transition-all duration-300 z-50">
       <div class="flex items-start gap-3">
         <div class="w-2 h-2 rounded-full bg-green-400 mt-1"></div>
         <div>
-          <div class="text-sm font-medium text-gray-900" id="toastTitle">Ã‰xito</div>
-          <div class="text-xs text-gray-500" id="toastMsg">OperaciÃ³n completada</div>
+          <div class="text-sm font-medium text-gray-900" id="toastTitle">Í‰xito</div>
+          <div class="text-xs text-gray-500" id="toastMsg">Operación completada</div>
         </div>
       </div>
     </div>
 
   </main>
 
-  <!-- iOS Bottom Tab Bar â€” Paleta iPhone 18 Pro -->
+  <!-- iOS Bottom Tab Bar — Paleta iPhone 18 Pro -->
   <nav id="bottomTabBar" class="fixed bottom-0 left-0 right-0 h-16 border-t border-white/30 bg-white/70 backdrop-blur-xl z-50 lg:hidden" style="background: var(--p18-glass-day, rgba(255,255,255,0.75)); border-color: rgba(255,255,255,0.5);">
     <div class="flex items-center justify-between px-4 py-2">
       <button onclick="app.switchPanel('dashboard')" class="tab-item flex flex-col items-center justify-center gap-1" id="tab-dashboard" style="color: var(--p18-blue-day, #007AFF);">
@@ -575,23 +639,25 @@
   </nav>
 
   <script src="js/cascade.js?v=20261020a"></script>
-  <script src="js/vault.js?v=20261019b"></script>
+  <script src="js/vault.js?v=20261020b"></script>
   <script src="js/terminal.js?v=20261019b"></script>
-  <script src="js/backend.js?v=20261019b"></script>
+  <script src="js/backend.js?v=20261020b"></script>
   <script src="js/live-sync.js?v=ls2"></script>
   <script src="js/palette.js?v=20261019b"></script>
   <script src="js/settings.js?v=20261019b"></script>
   <script src="js/app.js?v=20261020a"></script>
+  <script src="js/chat-stream.js?v=cs1"></script>
+  <script src="js/gemini-chat.js?v=gc1"></script>
   <script>
     // ============================================================
-    // LIQUID GLASS ENGINE v2 (aditivo, sin tocar lÃ³gica):
-    // A) RefracciÃ³n real vÃ­a SVG filter (soporte Chromium/Safari)
-    // B) Overlay .lg-shine: halo radial + borde cÃ³nico siguiendo cursor
-    // C) Tilt magnÃ©tico con fÃ­sica spring (solo hover, rAF-throttled)
-    // D) Pulso lumÃ­nico al conmutar el modelo activo de la cascada
+    // LIQUID GLASS ENGINE v2 (aditivo, sin tocar lógica):
+    // A) Refracción real vía SVG filter (soporte Chromium/Safari)
+    // B) Overlay .lg-shine: halo radial + borde cónico siguiendo cursor
+    // C) Tilt magnético con física spring (solo hover, rAF-throttled)
+    // D) Pulso lumínico al conmutar el modelo activo de la cascada
     // ============================================================
     (function () {
-      // --- A) RefracciÃ³n (feature-detect) ---
+      // --- A) Refracción (feature-detect) ---
       try {
         if (CSS.supports && CSS.supports('backdrop-filter', 'url(#glassDistort) blur(1px)')) {
           document.documentElement.classList.add('fx-refract');
@@ -611,7 +677,7 @@
 
       var canHover = window.matchMedia && window.matchMedia('(hover: hover) and (prefers-reduced-motion: no-preference)').matches;
 
-      // --- B/C) Overlays por widget + tilt magnÃ©tico ---
+      // --- B/C) Overlays por widget + tilt magnético ---
       function radiusOf(el) {
         return parseFloat(getComputedStyle(el).borderTopLeftRadius) || 28;
       }
@@ -624,7 +690,7 @@
 
         if (!canHover) return;
 
-        var ctx = { tg: 270 }; // Ã¡ngulo suavizado
+        var ctx = { tg: 270 }; // ángulo suavizado
         function onMove(e) {
           if (el._raf) return;
           el._raf = requestAnimationFrame(function () {
@@ -634,12 +700,12 @@
             var px = (x / r.width) * 100, py = (y / r.height) * 100;
             ov.style.setProperty('--mx', px + '%');
             ov.style.setProperty('--my', py + '%');
-            // Ã¡ngulo del cursor respecto al centro (para borde cÃ³nico)
+            // ángulo del cursor respecto al centro (para borde cónico)
             var ang = Math.atan2(y - r.height / 2, x - r.width / 2) * 180 / Math.PI;
             ctx.tg = (ang + 90 + 360) % 360;
             ov.style.setProperty('--shine-angle', ctx.tg + 'deg');
             el.style.setProperty('--mx', px + '%');
-            // tilt: desviaciÃ³n normalizada hacia el cursor
+            // tilt: desviación normalizada hacia el cursor
             var nx = (x / r.width - 0.5) * 2, ny = (y / r.height - 0.5) * 2;
             el.style.setProperty('--ry', (nx * 2.0).toFixed(2) + 'deg');
             el.style.setProperty('--rx', (-ny * 2.0).toFixed(2) + 'deg');
@@ -666,7 +732,7 @@
         }).observe(document.body, { childList: true, subtree: true });
       }
 
-      // --- D) Pulso lumÃ­nico al conmutar de modelo ---
+      // --- D) Pulso lumínico al conmutar de modelo ---
       var hero = null, lastModel = null;
       function wirePulse() {
         var m = document.getElementById('activeModel');
@@ -701,7 +767,7 @@
   </script>
   <script>
     // ============================================================
-    // UI GLUE (aditivo, sin tocar lÃ³gica existente):
+    // UI GLUE (aditivo, sin tocar lógica existente):
     // 1) Dynamic Island: espejo de reloj + estado del backend
     // 2) Gauge circular: sincroniza con tokenBarTotal/remainingTokens
     // ============================================================
@@ -727,7 +793,7 @@
         apply();
       }
 
-      // Gauge circular + tono de color segÃºn % de cuota usada
+      // Gauge circular + tono de color según % de cuota usada
       function paint() {
         const bar = document.getElementById('tokenBarTotal');
         const ring = document.getElementById('iosRing');

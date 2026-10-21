@@ -18,7 +18,10 @@ window.AIBackend = {
       if (!r.ok) throw new Error("HTTP " + r.status);
       const j = await r.json();
       this.online = true;
-      this.store = j.supabase_configured ? "supabase" : "memory";
+      // Compat: OpenCode renombro a supabase_connected + store sqlite/supabase.
+      // Se aceptan ambas claves para no romper el badge del HUD.
+      const isSb = !!(j.supabase_connected ?? j.supabase_configured);
+      this.store = j.store || (isSb ? "supabase" : "local");
       return j;
     } catch (e) {
       this.online = false;
@@ -59,6 +62,26 @@ window.AIBackend = {
     });
     if (!r.ok) throw new Error("Backend chat HTTP " + r.status);
     return await r.json();
+  },
+
+  async getModels() {
+    try {
+      const r = await fetch(this.baseUrl + "/api/cascade/models", {
+        headers: { "Content-Type": "application/json" },
+      });
+      if (!r.ok) return null;
+      return await r.json();
+    } catch (e) { return null; }
+  },
+
+  async getProviderStatus() {
+    try {
+      const r = await fetch(this.baseUrl + "/api/vault/status", {
+        headers: { "Content-Type": "application/json" },
+      });
+      if (!r.ok) return null;
+      return await r.json();
+    } catch (e) { return null; }
   },
 
   async updateBadge() {

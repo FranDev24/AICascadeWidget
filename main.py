@@ -8,6 +8,7 @@ por este mismo servidor: http://127.0.0.1:8000
 """
 
 import os
+import json
 import logging
 from datetime import datetime, timezone
 from typing import Optional, List, Dict, Any
@@ -21,6 +22,7 @@ from dotenv import load_dotenv
 import uvicorn
 
 import db as sq
+import cascadeengine as _engine
 
 load_dotenv()
 logging.basicConfig(level=logging.INFO,
@@ -155,16 +157,27 @@ def storage_get_key(provider: str) -> Optional[str]:
 
 
 def storage_key_providers() -> (str, List[str]):
+    provs: List[str] = []
+    src = "sqlite"
     if supabase:
         try:
             r = supabase.table("vault_keys").select("provider").eq(
                 "is_active", True).execute()
             if isinstance(r.data, list):
-                return "supabase", [x["provider"] for x in r.data]
+                provs = [x["provider"] for x in r.data]
+                src = "supabase"
         except Exception:
             pass
-    providers = sorted({k["provider"] for k in sq.get_keys() if k["is_active"]})
-    return "sqlite", providers
+    try:
+        local = [x["provider"] for x in sq.get_keys() if x.get("is_active")]
+        for p in local:
+            if p not in provs:
+                provs.append(p)
+        if src == "supabase" and local:
+            src = "supabase+sqlite"
+    except Exception:
+        pass
+    return src, provs
 
 
 def storage_keys_masked() -> List[Dict[str, Any]]:
@@ -198,11 +211,50 @@ def storage_delete_key(provider: str) -> bool:
 
 
 # ---------------------------------------------------------------- lifespan
+def _import_keys_from_opencode() -> List[str]:
+    """Importa claves reales de opencode (~/.local/share/opencode/auth.json)
+    al Vault local una sola vez; los placeholders ('sk-test...') se sobreescriben."""
+    if os.getenv("AICASCADE_IMPORT_KEYS", "1") != "1":
+        return []
+    path = os.path.expanduser(os.path.join("~", ".local", "share",
+                                           "opencode", "auth.json"))
+    imported = []
+    if not os.path.isfile(path):
+        return imported
+    try:
+        with open(path, encoding="utf-8") as fh:
+            auth = json.load(fh)
+    except Exception as e:
+        logger.warning("auth.json ilegible (%s): Vault sin auto-import", e)
+        return imported
+    for provider in ("google", "groq", "openrouter", "openai", "deepseek"):
+        try:
+            k = (auth.get(provider) or {}).get("key")
+        except Exception:
+            k = None
+        if not k:
+            continue
+        existing = storage_get_key(provider)
+        looks_placeholder = (not existing or str(existing).startswith("sk-test")
+                            or len(str(existing)) < 20)
+        if looks_placeholder:
+            storage_upsert_key(provider, k)
+            imported.append(provider)
+    if imported:
+        logger.info("Vault auto-import desde opencode: %s",
+                    ", ".join(imported))
+    return imported
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("Iniciando AICascade Backend...")
     sq.init()
     logger.info(f"SQLite DB lista: {sq.DB_PATH}")
+    try:
+        _import_keys_from_opencode()
+    except Exception as e:
+        logger.warning("auto-import de claves fallo (no critico): %s", e)
     yield
     logger.info("Backend detenido")
 
@@ -211,22 +263,71 @@ app = FastAPI(title="AICascade Widget API", version="2.1.0",
     description="Cascade failover + Vault + Chat. Supabase con fallback SQLite.",
     lifespan=lifespan, docs_url="/docs", redoc_url="/redoc")
 
-app.add_middleware(CORSMiddleware, allow_origins=["*"],
+app.add_middleware(CORSMiddleware,
+    allow_origins=["http://127.0.0.1:8000", "http://127.0.0.1:8765",
+        "http://localhost:8000", "http://localhost:8765",
+        "https://frandev24.github.io"],
+    allow_origin_regex=r"http://(127\.0\.0\.1|localhost)(:\d+)?",
     allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+
+
+# --- Private Network Access (Chrome 130+): la web en https://frandev24
+# llama a 127.0.0.1 -> el preflight EXIGE Allow-Private-Network: true.
+# CORSMiddleware de Starlette no lo agrega: capa propia externa lo inyecta.
+_PNA_ORIGINS = ("https://frandev24.github.io", "http://127.0.0.1",
+                "http://localhost")
+
+
+class _PrivateNetworkAccessMiddleware:
+    """Chrome 130+ Private Network Access: la web (https://frandev24.github
+    .io) llama al backend local 127.0.0.1:8000; el preflight exige
+    Access-Control-Allow-Private-Network: true. Inyecta ese header en las
+    respuestas (incluido el preflight) para origins permitidos."""
+
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        if scope.get("type") != "http":
+            return await self.app(scope, receive, send)
+        hdrs = {k.decode("latin-1").lower(): v.decode("latin-1")
+                for k, v in (scope.get("headers") or [])}
+        origin = hdrs.get("origin", "")
+        allowed = (origin in _PNA_ORIGINS[:1]
+                   or origin.startswith(_PNA_ORIGINS[1:]))
+        if not allowed:
+            return await self.app(scope, receive, send)
+
+        async def send_pna(message):
+            if message["type"] == "http.response.start":
+                hh = list(message.get("headers") or [])
+                hh.append((b"access-control-allow-private-network", b"true"))
+                message = {**message, "headers": hh}
+            await send(message)
+
+        await self.app(scope, receive, send_pna)
+
+
+# Se registra DESPUES de CORSMiddleware => queda mas externo (envuelve el
+# preflight del propio CORS y su respuesta).
+app.add_middleware(_PrivateNetworkAccessMiddleware)
 
 
 # ---------------------------------------------------------------- routes
 @app.get("/health")
 @app.get("/api/health")
 async def health():
+    is_sb = supabase is not None
     return {
         "status": "healthy",
         "timestamp": _utcnow(),
-        "supabase_connected": supabase is not None,
-        "supabase_configured": supabase is not None,
+        "supabase_connected": is_sb,
+        "supabase_configured": is_sb,
+        "store": "supabase" if is_sb else "sqlite",
         "sqlite_db": sq.DB_PATH,
-        "stored": "supabase+sqlite-fallback" if supabase else "sqlite",
+        "stored": "supabase+sqlite-fallback" if is_sb else "sqlite",
         "version": "2.1.0",
+        "cascade": _CASCADE.snapshot(),  # additive: CircuitBreaker por proveedor
     }
 
 
@@ -262,6 +363,28 @@ async def telemetry():
         "error_rate": 0.0,
         "providers_status": {p: {"configured": True} for p in storage_key_providers()[1]},
     }
+
+
+@app.get("/api/cascade/models")
+async def cascade_models():
+    """Lista de modelos disponibles para el selector tipo Gemini."""
+    chain = _CASCADE.snapshot().get("chain", [])
+    models = [
+        {"id": "cascade-auto", "name": "Cascade Auto (Failover)", "provider": "cascade", "tier": 1},
+        {"id": "google", "name": "Gemini 1.5 Flash", "provider": "google", "tier": 1},
+        {"id": "google-pro", "name": "Gemini 1.5 Pro", "provider": "google", "tier": 1},
+        {"id": "groq", "name": "Groq (gpt-oss-120b)", "provider": "groq", "tier": 2},
+        {"id": "openrouter", "name": "OpenRouter (Nemotron)", "provider": "openrouter", "tier": 2},
+        {"id": "openai", "name": "OpenAI (gpt-4o-mini)", "provider": "openai", "tier": 1},
+        {"id": "deepseek", "name": "DeepSeek V2 Lite", "provider": "deepseek", "tier": 3},
+        {"id": "ollama", "name": "Ollama (llama3.1:8b)", "provider": "ollama", "tier": 3},
+    ]
+    # Marcar cuáles tienen clave configurada
+    _, providers = storage_key_providers()
+    configured = set(providers)
+    for m in models:
+        m["configured"] = m["provider"] in configured or m["provider"] == "cascade"
+    return {"ok": True, "models": models, "chain": chain, "default": "cascade-auto"}
 
 
 @app.post("/api/vault/save", status_code=201)
@@ -308,101 +431,171 @@ async def simulate_failover(model_from: str = "Claude 3.5 Sonnet",
 
 
 # ---------------------------------------------------------------- chat
+@app.get("/api/cascade/metrics")
+async def cascade_metrics():
+    """KPIs en vivo del CascadeEngine (fuente: logs/engine_events.jsonl):
+    latencias p50/p95, llamadas por proveedor, fallos y tasa simulada."""
+    import statistics
+    events_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                               "logs", "engine_events.jsonl")
+    rows = []
+    try:
+        with open(events_path, encoding="utf-8", errors="ignore") as fh:
+            for line in fh:
+                line = line.strip()
+                if line:
+                    try:
+                        rows.append(json.loads(line))
+                    except Exception:
+                        pass
+    except FileNotFoundError:
+        rows = []
+    ok_rows = [r for r in rows if r.get("event") == "chat"]
+    lat = [r["latency_ms"] for r in ok_rows
+           if isinstance(r.get("latency_ms"), (int, float)) and r["latency_ms"] >= 0]
+    ttfb = [r["ttfb_ms"] for r in rows
+            if r.get("event") == "chat_stream"
+            and isinstance(r.get("ttfb_ms"), (int, float))]
+    provs = {}
+    for r in ok_rows + [x for x in rows if x.get("event") == "fallback"]:
+        p = r.get("provider") or "?"
+        d = provs.setdefault(p, {"ok": 0, "fails": 0, "lat": []})
+        if r.get("event") == "chat":
+            d["ok"] += 1
+            if isinstance(r.get("latency_ms"), (int, float)):
+                d["lat"].append(r["latency_ms"])
+        else:
+            d["fails"] += 1
+    for d in provs.values():
+        d["latency_ms_avg"] = round(statistics.fmean(d["lat"]), 1) if d["lat"] else None
+        d.pop("lat", None)
+    total = len(ok_rows) + sum(1 for r in rows if r.get("event") == "simulated")
+    sim = sum(1 for r in rows if r.get("event") == "simulated")
+
+    def pct(vals, q):
+        if not vals:
+            return None
+        v = sorted(vals)
+        return v[min(len(v) - 1, int(round(q * (len(v) - 1))))]
+
+    return {
+        "ok": True,
+        "engine": {"name": _CASCADE.NAME, "version": _CASCADE.VERSION},
+        "events": {"chat": len(ok_rows),
+                   "fallback": sum(1 for r in rows if r.get("event") == "fallback"),
+                   "simulated": sim,
+                   "retry": sum(1 for r in rows if r.get("event") == "retry"),
+                   "stream": sum(1 for r in rows
+                                 if str(r.get("event", "")).endswith("_stream")),
+                   "total": len(rows)},
+        "latency_ms": {"p50": pct(lat, 0.5), "p95": pct(lat, 0.95),
+                       "ttfb_p50": pct(ttfb, 0.5), "ttfb_p95": pct(ttfb, 0.95)},
+        "simulated_rate": round(sim / total, 3) if total else 0.0,
+        "providers": provs,
+        "breakers": {n: c.state.value for n, c in _CASCADE.breakers.items()},
+    }
+
+
+@app.get("/", include_in_schema=False)
+async def widget_root():
+    from fastapi.responses import FileResponse
+    idx = os.path.join(os.path.dirname(os.path.abspath(__file__)), "index.html")
+    return FileResponse(idx)
 def _vault_key(provider: str) -> Optional[str]:
     return storage_get_key(provider)
 
 
+# Motor de cascada: Circuit Breaker + Backoff+Jitter + telemetria JSONL.
+# Ver cascadeengine/engine.py para los patrones y referencias.
+# HEDGING (carrera de 2 proveedores) DESACTIVADO en prod: el modo secuencial
+# es el camion probado en test_engine.py (17/17 PASS). Se habilita con
+# AICASCADE_HEDGED=1 una vez reconciliado el race con Cline.
+_HEDGED_PROD = os.getenv("AICASCADE_HEDGED", "0") == "1"
+_CASCADE = _engine.CascadeEngine(
+    base_dir=os.path.dirname(os.path.abspath(__file__)),
+    failure_threshold=3, recovery_timeout=30.0,
+    per_call_timeout=4.5, ollama_timeout=4.0,
+    timeout_provider=4.5,
+    hedged=_HEDGED_PROD, hedge_delay=0.8)
+
+
 @app.post("/api/chat")
 async def chat(payload: ChatIn):
-    """Failover real: OpenAI -> DeepSeek -> Ollama -> simulado."""
-    import requests as _rq
+    """Failover real async (CascadeEngine): Google -> Groq -> OpenRouter ->
+    OpenAI -> DeepSeek -> Ollama -> simulado. No bloquea el event loop."""
     message = payload.message.strip()
     if not message:
         raise HTTPException(status_code=400, detail="Mensaje vacio")
-    attempts: List[Dict[str, Any]] = []
-
-    def _oai(base: str, key: str, model: str) -> str:
-        r = _rq.post(f"{base}/chat/completions",
-            headers={"Authorization": f"Bearer {key}"},
-            json={"model": model, "max_tokens": 512, "temperature": 0.7,
-                "messages": [{"role": "user", "content": message}]}, timeout=30)
-        r.raise_for_status()
-        return str(r.json()["choices"][0]["message"]["content"])
-
-    k = _vault_key("google")
-    if k:
-        try:
-            sq.touch_key("google")
-            g = _rq.post(
-                "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent",
-                params={"key": k},
-                json={"contents": [{"parts": [{"text": message}]}],
-                      "generationConfig": {"maxOutputTokens": 512}},
-                timeout=30)
-            g.raise_for_status()
-            txt = g.json()["candidates"][0]["content"]["parts"][0]["text"]
-            return {"ok": True, "mode": "live", "provider": "google",
-                    "model": "gemini-3.8-flash", "response": txt,
-                    "attempts": attempts}
-        except Exception as exc:
-            attempts.append({"provider": "google", "error": _safe_err(exc)})
-    k = _vault_key("groq")
-    if k:
-        try:
-            sq.touch_key("groq")
-            return {"ok": True, "mode": "live", "provider": "groq",
-                    "model": "openai/gpt-oss-120b",
-                    "response": _oai("https://api.groq.com/openai/v1", k,
-                                     "openai/gpt-oss-120b"),
-                    "attempts": attempts}
-        except Exception as exc:
-            attempts.append({"provider": "groq", "error": _safe_err(exc)})
-    k = _vault_key("openrouter")
-    if k:
-        try:
-            sq.touch_key("openrouter")
-            return {"ok": True, "mode": "live", "provider": "openrouter",
-                    "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
-                    "response": _oai("https://openrouter.ai/api/v1", k,
-                                     "nvidia/nemotron-3-ultra-550b-a55b:free"),
-                    "attempts": attempts}
-        except Exception as exc:
-            attempts.append({"provider": "openrouter", "error": _safe_err(exc)})
-    k = _vault_key("openai")
-    if k:
-        try:
-            sq.touch_key("openai")
-            return {"ok": True, "mode": "live", "provider": "openai",
-                "model": "gpt-4o-mini", "response": _oai(
-                    "https://api.openai.com/v1", k, "gpt-4o-mini"),
-                "attempts": attempts}
-        except Exception as exc:
-            attempts.append({"provider": "openai", "error": _safe_err(exc)})
-    k = _vault_key("deepseek")
-    if k:
-        try:
-            sq.touch_key("deepseek")
-            return {"ok": True, "mode": "live", "provider": "deepseek",
-                "model": "deepseek-chat",
-                "response": _oai("https://api.deepseek.com/v1", k, "deepseek-chat"),
-                "attempts": attempts}
-        except Exception as exc:
-            attempts.append({"provider": "deepseek", "error": _safe_err(exc)})
     try:
-        r = _rq.post("http://127.0.0.1:11434/api/generate",
-            json={"model": "llama3.1:8b", "prompt": message, "stream": False},
-            timeout=20)
-        if r.status_code == 200:
-            return {"ok": True, "mode": "live", "provider": "ollama",
-                "model": "llama3.1:8b", "response": r.json().get("response", ""),
-                "attempts": attempts}
+        r = await _CASCADE.chat(message, key_lookup=_vault_key,
+                                model_hint=payload.model)
     except Exception as exc:
-        attempts.append({"provider": "ollama", "error": str(exc)[:200]})
-    return {"ok": True, "mode": "simulated", "provider": "simulated",
-        "model": payload.model or "Cascade-Auto",
-        "response": "[SIMULADO - agrega keys en el Vault: openai/deepseek/ollama]\n\n"
-            + "Recibido: " + message[:200],
-        "attempts": attempts}
+        logger.exception("CascadeEngine fallo; fallback simulado controlado")
+        r = _engine.CascadeResult(
+            ok=True, mode="simulated", provider="simulated",
+            model=payload.model or "Cascade-Auto",
+            response="[SIMULADO - CascadeEngine indisponible]\n\nRecibido: "
+                     + message[:200],
+            attempts=[{"provider": "engine", "error": _safe_err(exc)}])
+    if r.mode == "live" and r.provider in ("google", "groq", "openrouter",
+                                           "openai", "deepseek", "ollama"):
+        try:
+            sq.touch_key(r.provider)
+        except Exception:
+            pass
+    logger.info("Chat ok [%s/%s] lat=%.0fms intentos=%d",
+                r.provider, r.mode, r.latency_ms, len(r.attempts))
+    return {"ok": r.ok, "mode": r.mode, "provider": r.provider,
+            "model": r.model, "response": r.response, "attempts": r.attempts,
+            "latency_ms": r.latency_ms, "breaker": r.breaker}
+
+
+@app.post("/api/cascade/reset-breakers")
+async def reset_breakers():
+    """Resetea el Circuit Breaker de todos los proveedores (operacion manual)."""
+    _CASCADE.reset_breakers()
+    return {"ok": True, "cascade": _CASCADE.snapshot()}
+
+
+@app.post("/api/chat/stream")
+async def chat_stream(payload: ChatIn):
+    """SSE token-por-token con failover por TTFB (OpenAI-style).
+
+    Eventos: 'start' -> 'meta'|'delta'* -> 'done'. Ultima salida 'simulated'.
+    curl -N -X POST :8000/api/chat/stream -H 'Content-Type: application/json' -d '{"message":"hola"}'
+    """
+    from fastapi.responses import StreamingResponse
+
+    message = payload.message.strip()
+    if not message:
+        raise HTTPException(status_code=400, detail="Mensaje vacio")
+
+    async def sse():
+        try:
+            async for evt in _CASCADE.stream_chat(
+                    message, key_lookup=_vault_key,
+                    model_hint=payload.model, ttfb_timeout=4.0):
+                kind = evt.get("event")
+                if kind == "delta":
+                    line = {"event": "delta", "provider": evt["provider"],
+                            "content": evt["content"]}
+                elif kind == "meta":
+                    line = {"event": "meta", "provider": evt["provider"],
+                            "model": evt.get("model")}
+                else:
+                    line = {**evt}
+                yield "data: " + json.dumps(line, ensure_ascii=False) + "\n\n"
+        except Exception as exc:
+            logger.exception("SSE stream fallo; cierre controlado")
+            yield ("data: " + json.dumps({"event": "done", "ok": False,
+                                          "provider": "engine",
+                                          "error": _safe_err(exc)},
+                                         ensure_ascii=False) + "\n\n")
+        yield "data: [DONE]\n\n"
+
+    return StreamingResponse(sse(), media_type="text/event-stream",
+                             headers={"Cache-Control": "no-cache",
+                                      "X-Accel-Buffering": "no"})
 
 
 @app.exception_handler(HTTPException)
@@ -417,11 +610,52 @@ async def gen_exc(request, exc):
     return JSONResponse(status_code=500, content={"detail": "Internal server error"})
 
 
-# mount "/" al final: la API tiene prioridad, todo lo demas sirve el widget
+# mount "/" al final: la API tiene prioridad, todo lo demas sirve el widget.
+# Nota seguridad: StaticFiles(html=True) expondria .env / .db / venv si se
+# montara todo el proyecto. Solo se sirven archivos del HUD (lista blanca).
 WEB_DIR = os.path.dirname(os.path.abspath(__file__))
 if os.path.isdir(WEB_DIR):
     from fastapi.staticfiles import StaticFiles
-    app.mount("/", StaticFiles(directory=WEB_DIR, html=True), name="widget")
+    from starlette.middleware.base import BaseHTTPMiddleware
+
+    _PUBLIC_FILES = {
+        "index.html", "manifest.webmanifest", "bridge.py",
+        "requirements.txt", "README.md", "app.ico",
+    }
+    _PUBLIC_PREFIXES = ("css/", "js/", "icons/")
+    _BLOCKED_SUFFIX = (".env", ".db", ".sqlite", ".sqlite3", ".log",
+        ".pem", ".key", ".bat", ".sh", ".pyc")
+    _BLOCKED_DIRS = ("venv/", ".git/", "__pycache__/", ".venv/")
+
+    class _GuardStatic(BaseHTTPMiddleware):
+        async def dispatch(self, request, call_next):
+            p = (request.url.path or "/").lstrip("/").lower()
+            if request.url.path.startswith("/api/") or request.url.path in (
+                    "/docs", "/redoc", "/openapi.json", "/health"):
+                return await call_next(request)
+            if (p.startswith(_BLOCKED_DIRS) or p.endswith(_BLOCKED_SUFFIX)
+                    or p in (".env", ".gitignore")):
+                return JSONResponse(status_code=404,
+                    content={"detail": "Not found"})
+            return await call_next(request)
+
+    app.add_middleware(_GuardStatic)
+
+    class _WhitelistStatic(StaticFiles):
+        async def get_response(self, path, scope):
+            from fastapi.responses import FileResponse
+            rel = (path or "").replace("\\", "/").lstrip("/")
+            if rel in ("", "/"):
+                return FileResponse(os.path.join(WEB_DIR, "index.html"))
+            ok = (rel in _PUBLIC_FILES
+                or rel.startswith(_PUBLIC_PREFIXES))
+            if not ok:
+                return JSONResponse(status_code=404,
+                    content={"detail": "Not found"})
+            return await super().get_response(path, scope)
+
+    app.mount("/", _WhitelistStatic(directory=WEB_DIR, html=True),
+        name="widget")
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)

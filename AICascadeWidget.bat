@@ -1,38 +1,17 @@
 @echo off
-cd /d "C:\Users\MT-110326\Documents\Programas\AICascadeWidget"
-
-:: Iniciar backend FastAPI (API + Widget en un solo puerto: 8000)
-:: y abrir el widget en Chrome/Edge en modo app
-echo ==========================================
-echo   AICascade Widget - Iniciando
-echo   API + Widget:  http://127.0.0.1:8000
-echo   Docs:          http://127.0.0.1:8000/docs
-echo ==========================================
-
-:: Buscar Chrome
-set "CHROME="
-if exist "C:\Program Files\Google\Chrome\Application\chrome.exe" set "CHROME=C:\Program Files\Google\Chrome\Application\chrome.exe"
-if exist "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" set "CHROME=C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"
-
-:: Buscar Edge como fallback
-set "EDGE="
-if exist "C:\Program Files\Microsoft\Edge\Application\msedge.exe" set "EDGE=C:\Program Files\Microsoft\Edge\Application\msedge.exe"
-if exist "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" set "EDGE=C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
-
-:: Usar python del venv si existe; si no, python del sistema
-set "PY=venv\Scripts\python.exe"
-if not exist "%PY%" set "PY=python"
-
-:: Abrir navegador en modo app
-if defined CHROME (
-    start "" "%CHROME%" --app="http://127.0.0.1:8000" --new-window
-) else if defined EDGE (
-    start "" "%EDGE%" --app="http://127.0.0.1:8000" --new-window
-) else (
-    start "" "http://127.0.0.1:8000"
+REM AICascade Widget - Launcher principal (doble clic / acceso directo)
+setlocal
+cd /d "%~dp0"
+if not exist "venv\Scripts\python.exe" (
+  echo [setup] Creando entorno virtual...
+  python -m venv venv
+  call "venv\Scripts\activate.bat"
+  python -m pip install -q -r requirements.txt
 )
-
-:: Arrancar backend (quedara corriendo en esta consola)
-"%PY%" -m uvicorn main:app --host 127.0.0.1 --port 8000
-
-pause
+if not exist app.ico (
+  echo [logo] Generando app.ico...
+  venv\Scripts\python.exe tools\make_logo.py
+)
+REM Ventana nativa (pywebview) con fallback automatico a Chrome/Edge --app
+start "" "venv\Scripts\pythonw.exe" desktop_app.py
+endlocal

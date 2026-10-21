@@ -13,3 +13,8 @@ Thumbs.db
 
 # Base local con claves del vault (NUNCA al repo)
 aicascade.db
+
+# Telemetria / cache / perfiles de engine
+logs/
+litellm_cache/
+engine-profile/

@@ -26,16 +26,29 @@ CREATE TABLE IF NOT EXISTS vault_keys (
     is_active BOOLEAN NOT NULL DEFAULT TRUE
 );
 
+-- Sesiones de cascada (paridad con SQLite db.py)
+CREATE TABLE IF NOT EXISTS sessions (
+    session_id TEXT PRIMARY KEY,
+    active_model TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    total_calls INT NOT NULL DEFAULT 0,
+    total_switches INT NOT NULL DEFAULT 0
+);
+
 -- Índices para consultas frecuentes
 CREATE INDEX IF NOT EXISTS idx_cascade_logs_created_at ON cascade_logs (created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_cascade_logs_session ON cascade_logs (session_id);
 CREATE INDEX IF NOT EXISTS idx_vault_keys_provider ON vault_keys (provider);
 CREATE INDEX IF NOT EXISTS idx_vault_keys_active ON vault_keys (is_active);
 
+-- Paridad con SQLite (db.py): contador de uso por key
+ALTER TABLE vault_keys ADD COLUMN IF NOT EXISTS usage_count INT NOT NULL DEFAULT 0;
+
 -- Row Level Security (RLS) — políticas permisivas para desarrollo local.
 -- En producción, restringe con auth.uid() según tu modelo de autenticación.
 ALTER TABLE cascade_logs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE vault_keys ENABLE ROW LEVEL SECURITY;
+ALTER TABLE sessions ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "Allow all for local dev" ON cascade_logs;
 CREATE POLICY "Allow all for local dev" ON cascade_logs
@@ -43,5 +56,9 @@ CREATE POLICY "Allow all for local dev" ON cascade_logs
 
 DROP POLICY IF EXISTS "Allow all for local dev" ON vault_keys;
 CREATE POLICY "Allow all for local dev" ON vault_keys
+    FOR ALL USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Allow all for local dev" ON sessions;
+CREATE POLICY "Allow all for local dev" ON sessions
     FOR ALL USING (true) WITH CHECK (true);
 

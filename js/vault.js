@@ -3,12 +3,17 @@
 // ============================================================================
 
 const vault = {
+  // 9 proveedores = paridad total con backend main.py VaultKeyCreate
   providers: [
     { id: 'openai', name: 'OpenAI', models: ['GPT-4o', 'GPT-4o-mini'], color: 'text-black bg-gray-100' },
     { id: 'anthropic', name: 'Anthropic', models: ['Claude 3.5 Sonnet', 'Claude 3 Haiku'], color: 'text-orange-600 bg-orange-50' },
     { id: 'google', name: 'Google Gemini', models: ['Gemini 1.5 Pro', 'Gemini 1.5 Flash'], color: 'text-blue-600 bg-blue-50' },
     { id: 'ollama', name: 'Ollama (Local)', models: ['Llama 3.1 70B', 'Llama 3.1 8B'], color: 'text-red-600 bg-red-50' },
-    { id: 'deepseek', name: 'DeepSeek', models: ['DeepSeek V2 Lite'], color: 'text-purple-600 bg-purple-50' }
+    { id: 'deepseek', name: 'DeepSeek', models: ['DeepSeek V2 Lite'], color: 'text-purple-600 bg-purple-50' },
+    { id: 'openrouter', name: 'OpenRouter', models: ['Nemotron 3 Ultra 550B'], color: 'text-cyan-700 bg-cyan-50' },
+    { id: 'groq', name: 'Groq', models: ['GPT-OSS 120B'], color: 'text-rose-600 bg-rose-50' },
+    { id: 'meta', name: 'Meta', models: ['Llama 3.1 70B', 'Llama 3.1 8B'], color: 'text-indigo-600 bg-indigo-50' },
+    { id: 'xai', name: 'xAI (Grok)', models: ['Grok'], color: 'text-slate-700 bg-slate-100' }
   ],
 
   // Cargar claves desde localStorage (simulación de vault local)
@@ -116,7 +121,7 @@ const vault = {
     } catch (e) { /* modo local */ }
   },
 
-  // ---------- Validación por proveedor ----------
+  // ---------- Validación por proveedor (9/9 paridad backend) ----------
   validateKey(provider, key) {
     if (!key) { app.showToast('Error', 'Ingresa una clave API válida', 'error'); return false; }
     const patterns = {
@@ -125,6 +130,9 @@ const vault = {
       google: /^[A-Za-z0-9-_]{15,}$/,
       deepseek: /^sk-[A-Za-z0-9-_]{10,}$/,
       openrouter: /^sk-or-[A-Za-z0-9-_]{10,}$/,
+      groq: /^(gsk_|sk-)[A-Za-z0-9-_]{10,}$/,
+      meta: /^.{4,}$/,
+      xai: /^(xai-)[A-Za-z0-9-_]{10,}$/,
       ollama: /^.+$/,
     };
     const rx = patterns[provider] || /^.{4,}$/;

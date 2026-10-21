@@ -16,6 +16,8 @@ import logging
 from datetime import datetime
 from typing import Optional, List, Dict, Any
 
+import vault_crypto as vc
+
 logger = logging.getLogger("aicascade-storage")
 
 DB_PATH = os.path.join(
@@ -124,12 +126,13 @@ def upsert_key(provider: str, api_key: str, is_active: bool = True) -> None:
     with _lock:
         conn = _conn()
         try:
+            stored = vc.protect(api_key)  # cifrado-at-rest (DPAPI)
             conn.execute(
                 "INSERT INTO vault_keys (provider, api_key, is_active, created_at)"
                 " VALUES (?,?,?,CURRENT_TIMESTAMP)"
                 " ON CONFLICT(provider) DO UPDATE SET api_key=excluded.api_key,"
                 " is_active=excluded.is_active",
-                (provider, api_key, int(is_active)),
+                (provider, stored, int(is_active)),
             )
             conn.commit()
         finally:
@@ -143,7 +146,13 @@ def get_key(provider: str) -> Optional[str]:
             row = conn.execute(
                 "SELECT api_key FROM vault_keys WHERE provider=? AND is_active=1",
                 (provider,)).fetchone()
-            return row["api_key"] if row else None
+            if not row:
+                return None
+            try:
+                return vc.unprotect(row["api_key"])
+            except Exception as e:  # blob ilegible (otra maquina/usuario)
+                logger.error("Vault key %s ilegible: %s", provider, e)
+                return None
         finally:
             conn.close()
 
@@ -155,7 +164,15 @@ def get_keys() -> List[Dict[str, Any]]:
             rows = conn.execute(
                 "SELECT provider, api_key, is_active, created_at, usage_count"
                 " FROM vault_keys ORDER BY provider").fetchall()
-            return [dict(r) for r in rows]
+            out = []
+            for r in rows:
+                item = dict(r)
+                try:
+                    item["api_key"] = vc.unprotect(item["api_key"])
+                except Exception:
+                    item["api_key"] = None  # ilegible -> no exponer
+                out.append(item)
+            return out
         finally:
             conn.close()
 

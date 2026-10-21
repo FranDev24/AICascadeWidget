@@ -6,6 +6,11 @@ const app = {
   currentPanel: 'dashboard',
   _switched: false,
   _switchedFrom: null,
+  _chatBusy: false,
+  _selectedModel: 'cascade-auto',
+  _suggestionsOpen: false,
+  _models: [],
+  _voiceActive: false,
 
   init() {
     this.bindEvents();
@@ -27,6 +32,8 @@ const app = {
     if (window.LiveSync) { window.LiveSync.init(); }
     // Exponer global para onclick="app.*" y para palette/settings/terminal
     window.app = this;
+    // Cargar modelos para el selector tipo Gemini
+    this.loadModels();
     this.showToast('AICascade Widget', 'Sistema listo — Modelo más potente seleccionado automáticamente', 'success');
   },
 
@@ -50,6 +57,119 @@ const app = {
     if (chatInput) chatInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') this.sendChat();
     });
+  },
+
+  // ========== NUEVO: Selector de modelos tipo Gemini ==========
+  async loadModels() {
+    try {
+      if (window.AIBackend && window.AIBackend.online) {
+        const data = await window.AIBackend.getModels();
+        if (data && data.ok) {
+          this._models = data.models;
+          this.renderModelMenu();
+        }
+      }
+    } catch (e) { /* silencioso */ }
+  },
+
+  renderModelMenu() {
+    const list = document.getElementById('modelList');
+    if (!list) return;
+    list.innerHTML = this._models.map(m => `
+      <div class="flex items-center justify-between px-4 py-2 text-sm hover:bg-gray-50 rounded-lg cursor-pointer transition-colors" onclick="app.selectModel('${m.id}')">
+        <div class="flex items-center gap-3">
+          <span class="w-2 h-2 rounded-full ${m.configured ? 'bg-green-500' : 'bg-gray-400'}"></span>
+          <span class="${m.configured ? 'text-gray-900' : 'text-gray-400'} font-medium">${m.name}</span>
+        </div>
+        <span class="text-[10px] text-gray-400 font-mono">${m.provider}</span>
+      </div>
+    `).join('');
+  },
+
+  toggleModelMenu() {
+    const menu = document.getElementById('modelMenu');
+    if (menu) menu.classList.toggle('hidden');
+  },
+
+  selectModel(modelId) {
+    this._selectedModel = modelId;
+    const m = this._models.find(x => x.id === modelId);
+    const label = document.getElementById('modelLabel');
+    if (label && m) label.textContent = m.name;
+    const menu = document.getElementById('modelMenu');
+    if (menu) menu.classList.add('hidden');
+    this.showToast('Modelo', m ? m.name : modelId, 'info');
+  },
+
+  // ========== NUEVO: Sugerencias @ para conectores ==========
+  toggleSuggestions() {
+    this._suggestionsOpen = !this._suggestionsOpen;
+    const panel = document.getElementById('suggestionsPanel');
+    const btn = document.getElementById('atSuggestionBtn');
+    if (panel) {
+      panel.classList.toggle('hidden');
+      if (this._suggestionsOpen) this.renderSuggestions();
+    }
+    if (btn) btn.className = this._suggestionsOpen
+      ? 'text-indigo-500 p-2 rounded-lg bg-white/10'
+      : 'text-gray-400 hover:text-indigo-500 transition-colors p-2 rounded-lg hover:bg-white/5';
+  },
+
+  renderSuggestions() {
+    const list = document.getElementById('suggestionsList');
+    if (!list) return;
+    const suggs = [
+      { id: 'google', name: 'Google Gemini', icon: '🧠' },
+      { id: 'groq', name: 'Groq', icon: '⚡' },
+      { id: 'openrouter', name: 'OpenRouter', icon: '🔀' },
+      { id: 'openai', name: 'OpenAI', icon: '🤖' },
+      { id: 'deepseek', name: 'DeepSeek', icon: '🔍' },
+      { id: 'ollama', name: 'Ollama (Local)', icon: '🏠' },
+      { id: 'cascade', name: 'Cascada (Failover)', icon: '🌊' },
+    ];
+    list.innerHTML = suggs.map(s => `
+      <button onclick="app.insertSuggestion('${s.id}')" class="flex items-center justify-between px-3 py-2 rounded-lg text-left hover:bg-gray-50 transition-colors text-sm">
+        <span class="text-lg mr-2">${s.icon}</span>
+        <span class="text-gray-700 font-medium">${s.name}</span>
+      </button>
+    `).join('');
+  },
+
+  insertSuggestion(providerId) {
+    const input = document.getElementById('chatInput');
+    if (!input) return;
+    const m = this._models.find(x => x.provider === providerId) || this._models.find(x => x.id === providerId);
+    if (m) {
+      this._selectedModel = m.id;
+      const label = document.getElementById('modelLabel');
+      if (label) label.textContent = m.name;
+      input.focus();
+      this.toggleSuggestions();
+      this.showToast('Modelo', m.name, 'info');
+    }
+  },
+
+  // ========== NUEVO: Entrada por voz (placeholder visual) ==========
+  toggleVoiceInput() {
+    this._voiceActive = !this._voiceActive;
+    const btn = document.getElementById('voiceBtn');
+    if (btn) {
+      btn.className = this._voiceActive
+        ? 'text-green-500 p-2 rounded-lg bg-green-500/10 animate-pulse'
+        : 'text-gray-400 hover:text-green-500 transition-colors p-2 rounded-lg hover:bg-white/5';
+    }
+    this.showToast(this._voiceActive ? 'Voz activada' : 'Voz desactivada', 'Habla al micrófono (próximamente con Web Speech API)', 'info');
+  },
+
+  // ========== NUEVO: Indicador de escritura ==========
+  _showTyping() {
+    const el = document.getElementById('typingIndicator');
+    if (el) el.classList.remove('hidden');
+  },
+
+  _hideTyping() {
+    const el = document.getElementById('typingIndicator');
+    if (el) el.classList.add('hidden');
   },
 
   startClock() {
@@ -158,62 +278,122 @@ const app = {
   // ========== CHAT IA (backend con failover, fallback local) ==========
   _chatBusy: false,
 
-  _chatBubble(who, text) {
+  _chatBubble(who, text, meta) {
     const logEl = document.getElementById('chatLog');
     if (!logEl) return;
     const wrap = document.createElement('div');
     const mine = who === 'user';
-    wrap.className = 'flex ' + (mine ? 'justify-end' : 'justify-start');
-    wrap.innerHTML = '<div class="max-w-[80%] px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap '
-      + (mine ? 'bg-blue-600 text-white rounded-br-md shadow-md' : 'bg-white/70 text-gray-800 rounded-bl-md border border-white/50')
-      + '"></div>';
-    wrap.firstChild.textContent = text;
+    const now = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false });
+
+    if (mine) {
+      wrap.className = 'flex justify-end items-end gap-2';
+      wrap.innerHTML = `
+        <div class="max-w-[75%] rounded-2xl rounded-tl-none bg-indigo-600 text-white px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap shadow-lg shadow-indigo-500/20">
+          ${text.replace(/\n/g, '<br>')}
+        </div>
+        <span class="text-[10px] text-indigo-200 mt-1">${now}</span>
+      `;
+    } else {
+      const providerBadge = meta && meta.provider ? `
+        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-gray-700 text-[10px] font-medium text-gray-300 mb-1">
+          <span class="w-1.5 h-1.5 rounded-full ${meta.provider === 'simulated' ? 'bg-amber-500' : 'bg-green-500'}"></span>
+          ${meta.provider}
+        </span>
+      ` : '';
+      const modelBadge = meta && meta.model ? `
+        <span class="text-[10px] text-gray-500 font-mono mt-1">${meta.model}</span>
+      ` : '';
+      wrap.className = 'flex justify-start items-end gap-2';
+      wrap.innerHTML = `
+        ${providerBadge}
+        <div class="max-w-[75%] rounded-2xl rounded-br-none bg-gray-800 p-4 text-sm text-gray-200 leading-relaxed whitespace-pre-wrap border border-gray-700/50 shadow-md">
+          ${text.replace(/\n/g, '<br>')}
+        </div>
+        ${modelBadge}
+        <span class="text-[10px] text-gray-600 mt-1">${now}</span>
+      `;
+    }
     logEl.appendChild(wrap);
     logEl.scrollTop = logEl.scrollHeight;
-  },
+    return wrap;
+  },},
 
   async sendChat() {
     const input = document.getElementById('chatInput');
-    const modeEl = document.getElementById('chatMode');
+    const modeEl = document.getElementById('chatBackendBadge');
     if (!input || this._chatBusy) return;
     const msg = input.value.trim();
     if (!msg) return;
     input.value = '';
     this._chatBusy = true;
+
+    // Mostrar burbuja de usuario
     this._chatBubble('user', msg);
-    this._chatBubble('ai', '… pensando …');
+
+    // Mostrar indicador de escritura
+    this._showTyping();
+
     const logEl = document.getElementById('chatLog');
-    const thinking = logEl ? logEl.lastChild : null;
     try {
       if (window.AIBackend && window.AIBackend.online) {
-        const res = await window.AIBackend.chat(msg);
-        if (thinking) thinking.remove();
-        if (modeEl) {
-          modeEl.textContent = 'modo: ' + (res.mode || 'live') + ' · ' + (res.provider || '');
-          modeEl.className = 'text-xs font-medium px-2.5 py-1 rounded-full '
-            + (res.mode === 'live' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700');
+        // Intentar streaming primero
+        const useStream = window.ChatStream && typeof window.ChatStream.send === 'function';
+        let res;
+        if (useStream) {
+          res = await window.ChatStream.send(msg, this._selectedModel, (provider, content, model) => {
+            // Actualizar burbuja progresiva durante el stream
+            const last = logEl.lastElementChild;
+            if (last && last.dataset.streaming === 'true') {
+              last.querySelector('.msg-content').textContent += content;
+              logEl.scrollTop = logEl.scrollHeight;
+            } else {
+              const bubble = this._chatBubble('ai', '', { provider, model });
+              bubble.querySelector('.msg-content').textContent = content;
+              bubble.dataset.streaming = 'true';
+            }
+          });
+          this._hideTyping();
+        } else {
+          res = await window.AIBackend.chat(msg, this._selectedModel);
+          this._hideTyping();
         }
-        this._chatBubble('ai', (res.response || '(sin respuesta)')
-          + (res.model ? '\n\n— ' + res.model + ' [' + (res.provider || '') + ']' : ''));
+
+        if (modeEl) {
+          const isLive = res.mode === 'live';
+          modeEl.textContent = '● ' + (res.provider || 'local');
+          modeEl.className = 'text-xs font-medium px-2 py-1 rounded-full '
+            + (isLive ? 'bg-green-500/10 text-green-400 border border-green-500/30' : 'bg-amber-500/10 text-amber-400 border border-amber-500/30');
+        }
+
+        // Si no hubo streaming, mostrar la respuesta final
+        if (!useStream) {
+          this._chatBubble('ai', res.response || '(sin respuesta)', {
+            provider: res.provider,
+            model: res.model
+          });
+        }
+
         if (window.app) window.app.render();
         return;
       }
-      // Fallback: cascada simulada local (OpenCode la dejó lista)
+
+      // Fallback: cascada simulada local
       const r = await cascadeChat(msg);
-      if (thinking) thinking.remove();
-      if (modeEl) modeEl.textContent = 'modo: local (backend offline)';
+      this._hideTyping();
+      if (modeEl) modeEl.textContent = '● Local';
+      if (modeEl) modeEl.className = 'text-xs font-medium px-2 py-1 rounded-full bg-gray-500/10 text-gray-400 border border-gray-500/30';
       const tmp = document.createElement('div');
       tmp.innerHTML = r.html;
       const txt = tmp.textContent || tmp.innerText || '(sin respuesta)';
-      this._chatBubble('ai', txt.trim().substring(0, 2000));
+      this._chatBubble('ai', txt.trim().substring(0, 2000), { provider: 'local', model: 'Cascade-Auto' });
       if (window.app) window.app.render();
     } catch (e) {
-      if (thinking) thinking.remove();
-      this._chatBubble('ai', '[ERROR] No se pudo contactar al backend: ' + e.message);
+      this._hideTyping();
+      this._chatBubble('ai', '[ERROR] No se pudo contactar al backend: ' + e.message, { provider: 'error' });
     } finally {
       this._chatBusy = false;
     }
-  },
+  },},
 
   // ========== RENDER DASHBOARD ==========
   render() {
